@@ -2,40 +2,40 @@ services:
   # PostgreSQL база данных
   postgres:
     image: postgres:15-alpine
-    container_name: conversation_postgres
+    container_name: task_postgres
     environment:
-      POSTGRES_DB: conversationdb
-      POSTGRES_USER: conversationuser
-      POSTGRES_PASSWORD: conversationpass
+      POSTGRES_DB: taskdb
+      POSTGRES_USER: taskuser
+      POSTGRES_PASSWORD: taskpass
     ports:
-      - "5434:5432"
+      - "5436:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - oktarion_conversations_net
+      - oktarion_tasks_net
       - oktarion_ngg
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U conversationuser -d conversationdb"]
+      test: ["CMD-SHELL", "pg_isready -U taskuser -d taskdb"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   # Микросервис на Ktor
-  conversation-service:
+  task-service:
     build: .
-    container_name: conversation_microservice
+    container_name: task_microservice
     ports:
-      - "${SERVER_PORT:-8042}:${SERVER_PORT:-8042}"
+      - "${SERVER_PORT:-8046}:${SERVER_PORT:-8046}"
     environment:
       # Database configuration
-      POSTGRES_URL: ${POSTGRES_URL:-jdbc:postgresql://postgres:5432/conversationdb}
-      POSTGRES_USER: ${POSTGRES_USER:-conversationuser}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-conversationpass}
+      POSTGRES_URL: ${POSTGRES_URL:-jdbc:postgresql://postgres:5432/taskdb}
+      POSTGRES_USER: ${POSTGRES_USER:-taskuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskpass}
       DB_MAX_POOL_SIZE: ${DB_MAX_POOL_SIZE:-10}
       
       # Server configuration
-      SERVER_PORT: ${SERVER_PORT:-8042}
+      SERVER_PORT: ${SERVER_PORT:-8046}
       SERVER_HOST: ${SERVER_HOST:-0.0.0.0}
       ENVIRONMENT: ${ENVIRONMENT:-production}
       
@@ -53,11 +53,11 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - oktarion_conversations_net
+      - oktarion_tasks_net
       - oktarion_ngg
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT:-8042}/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT:-8046}/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -67,7 +67,7 @@ volumes:
   postgres_data:
 
 networks:
-  oktarion_conversations_net:
+  oktarion_tasks_net:
     driver: bridge
   oktarion_ngg:
     external: true

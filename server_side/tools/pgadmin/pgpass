@@ -1,4 +1,7 @@
 contact_postgres:5432:*:contactuser:contactpass
 conversation_postgres:5432:*:conversationuser:conversationpass
+message_postgres:5432:*:messageuser:messagepass
+task_postgres:5432:*:taskuser:taskpass
+event_postgres:5432:*:eventuser:eventpass
 hoppscotch-db:5432:*:hoppscotch:hoppscotch
 

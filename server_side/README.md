@@ -42,8 +42,14 @@ cd server_side
 | Dozzle | http://localhost:9999 | Просмотр логов |
 | Contact Microservice | http://localhost:8040 | API микросервиса |
 | Conversation Microservice | http://localhost:8042 | API микросервиса |
-| Contact DB | localhost:5432 | PostgreSQL БД |
+| Message Microservice | http://localhost:8044 | API микросервиса |
+| Task Microservice | http://localhost:8046 | API микросервиса |
+| Event Microservice | http://localhost:8048 | API микросервиса |
+| Contact DB | localhost:5433 | PostgreSQL БД |
 | Conversation DB | localhost:5434 | PostgreSQL БД |
+| Message DB | localhost:5435 | PostgreSQL БД |
+| Task DB | localhost:5436 | PostgreSQL БД |
+| Event DB | localhost:5437 | PostgreSQL БД |
 
 ## Учетные данные
 
@@ -63,6 +69,24 @@ cd server_side
 - Username: `conversationuser`
 - Password: `conversationpass`
 
+### Message Database
+- Host: `message_postgres` (внутри Docker) или `localhost:5435` (снаружи)
+- Database: `messagedb`
+- Username: `messageuser`
+- Password: `messagepass`
+
+### Task Database
+- Host: `task_postgres` (внутри Docker) или `localhost:5436` (снаружи)
+- Database: `taskdb`
+- Username: `taskuser`
+- Password: `taskpass`
+
+### Event Database
+- Host: `event_postgres` (внутри Docker) или `localhost:5437` (снаружи)
+- Database: `eventdb`
+- Username: `eventuser`
+- Password: `eventpass`
+
 ## Структура проекта
 
 ```
@@ -74,7 +98,16 @@ server_side/
 │   ├── contact_micro/       # Contact микросервис
 │   │   ├── docker-compose.yml
 │   │   └── src/             # Исходный код
-│   └── conversation_micro/ # Conversation микросервис
+│   ├── conversation_micro/  # Conversation микросервис
+│   │   ├── docker-compose.yml
+│   │   └── src/             # Исходный код
+│   ├── message_micro/      # Message микросервис
+│   │   ├── docker-compose.yml
+│   │   └── src/             # Исходный код
+│   ├── task_micro/         # Task микросервис
+│   │   ├── docker-compose.yml
+│   │   └── src/             # Исходный код
+│   └── event_micro/        # Event микросервис
 │       ├── docker-compose.yml
 │       └── src/             # Исходный код
 ├── start-all.sh            # Скрипт запуска всех сервисов
@@ -123,3 +156,10 @@ networks:
   oktarion_ngg:
     external: true
 ```
+
+### Примеры названий сетей:
+- `oktarion_contacts_net` - для contact микросервиса
+- `oktarion_conversations_net` - для conversation микросервиса  
+- `oktarion_messages_net` - для message микросервиса
+- `oktarion_tasks_net` - для task микросервиса
+- `oktarion_events_net` - для event микросервиса

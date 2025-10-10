@@ -42,9 +42,42 @@ fi
 
 log "Используется команда: $COMPOSE_CMD"
 
+# Остановка event microservice
+log "Остановка Event микросервиса..."
+cd "$(dirname "$0")/business_micros/event_micro"
+$COMPOSE_CMD down
+
+if [ $? -eq 0 ]; then
+    success "Event микросервис остановлен"
+else
+    warning "Ошибка при остановке Event микросервиса"
+fi
+
+# Остановка task microservice
+log "Остановка Task микросервиса..."
+cd "../task_micro"
+$COMPOSE_CMD down
+
+if [ $? -eq 0 ]; then
+    success "Task микросервис остановлен"
+else
+    warning "Ошибка при остановке Task микросервиса"
+fi
+
+# Остановка message microservice
+log "Остановка Message микросервиса..."
+cd "../message_micro"
+$COMPOSE_CMD down
+
+if [ $? -eq 0 ]; then
+    success "Message микросервис остановлен"
+else
+    warning "Ошибка при остановке Message микросервиса"
+fi
+
 # Остановка conversation microservice
 log "Остановка Conversation микросервиса..."
-cd "$(dirname "$0")/business_micros/conversation_micro"
+cd "../conversation_micro"
 $COMPOSE_CMD down
 
 if [ $? -eq 0 ]; then
@@ -77,7 +110,7 @@ fi
 
 # Опционально: удаление сетей (раскомментируйте если нужно)
 # log "Удаление внутренних сетей микросервисов..."
-# docker network rm oktarion_conversations_net oktarion_contacts_net
+# docker network rm oktarion_events_net oktarion_tasks_net oktarion_messages_net oktarion_conversations_net oktarion_contacts_net
 # success "Внутренние сети микросервисов удалены"
 # 
 # log "Удаление общей сети oktarion_ngg..."

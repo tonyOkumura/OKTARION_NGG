@@ -75,6 +75,9 @@ create_network_if_not_exists "oktarion_ngg"
 # Внутренние сети микросервисов
 create_network_if_not_exists "oktarion_contacts_net"
 create_network_if_not_exists "oktarion_conversations_net"
+create_network_if_not_exists "oktarion_messages_net"
+create_network_if_not_exists "oktarion_tasks_net"
+create_network_if_not_exists "oktarion_events_net"
 
 # Переход в директорию tools
 log "Запуск инструментов разработки..."
@@ -121,6 +124,51 @@ else
     exit 1
 fi
 
+# Переход в директорию message_micro
+log "Запуск микросервиса Message..."
+cd "../message_micro"
+
+# Запуск message microservice
+log "Запуск Message микросервиса..."
+$COMPOSE_CMD up -d
+
+if [ $? -eq 0 ]; then
+    success "Message микросервис запущен успешно"
+else
+    error "Ошибка при запуске Message микросервиса"
+    exit 1
+fi
+
+# Переход в директорию task_micro
+log "Запуск микросервиса Task..."
+cd "../task_micro"
+
+# Запуск task microservice
+log "Запуск Task микросервиса..."
+$COMPOSE_CMD up -d
+
+if [ $? -eq 0 ]; then
+    success "Task микросервис запущен успешно"
+else
+    error "Ошибка при запуске Task микросервиса"
+    exit 1
+fi
+
+# Переход в директорию event_micro
+log "Запуск микросервиса Event..."
+cd "../event_micro"
+
+# Запуск event microservice
+log "Запуск Event микросервиса..."
+$COMPOSE_CMD up -d
+
+if [ $? -eq 0 ]; then
+    success "Event микросервис запущен успешно"
+else
+    error "Ошибка при запуске Event микросервиса"
+    exit 1
+fi
+
 # Ожидание готовности сервисов
 log "Ожидание готовности сервисов..."
 sleep 10
@@ -144,8 +192,14 @@ echo "• Portainer: http://localhost:9001"
 echo "• Dozzle (логи): http://localhost:9999"
 echo "• Contact Microservice: http://localhost:8040"
 echo "• Conversation Microservice: http://localhost:8042"
+echo "• Message Microservice: http://localhost:8044"
+echo "• Task Microservice: http://localhost:8046"
+echo "• Event Microservice: http://localhost:8048"
 echo "• Contact DB (PostgreSQL): localhost:5432"
 echo "• Conversation DB (PostgreSQL): localhost:5434"
+echo "• Message DB (PostgreSQL): localhost:5435"
+echo "• Task DB (PostgreSQL): localhost:5436"
+echo "• Event DB (PostgreSQL): localhost:5440"
 
 echo ""
 echo "🔧 Полезные команды:"
