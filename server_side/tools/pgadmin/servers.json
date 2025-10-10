@@ -1,0 +1,38 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Contact Micro DB",
+      "Group": "Servers",
+      "Host": "contact_postgres",
+      "Port": 5432,
+      "MaintenanceDB": "contactdb",
+      "Username": "contactuser",
+      "Password": "contactpass",
+      "SavePassword": true,
+      "SSLMode": "prefer"
+    },
+    "2": {
+      "Name": "Conversation Micro DB",
+      "Group": "Servers",
+      "Host": "conversation_postgres",
+      "Port": 5432,
+      "MaintenanceDB": "conversationdb",
+      "Username": "conversationuser",
+      "Password": "conversationpass",
+      "SavePassword": true,
+      "SSLMode": "prefer"
+    },
+    "3": {
+      "Name": "Hoppscotch DB",
+      "Group": "Servers",
+      "Host": "hoppscotch-db",
+      "Port": 5432,
+      "MaintenanceDB": "hoppscotch",
+      "Username": "hoppscotch",
+      "Password": "hoppscotch",
+      "SavePassword": true,
+      "SSLMode": "prefer"
+    }
+  }
+}
+

@@ -1,0 +1,139 @@
+services:
+  # Database for Hoppscotch (isolated from main app DB)
+  hoppscotch-db:
+    image: postgres:14
+    container_name: hoppscotch-db
+    restart: always
+    environment:
+      - POSTGRES_USER=hoppscotch
+      - POSTGRES_PASSWORD=hoppscotch
+      - POSTGRES_DB=hoppscotch
+    volumes:
+      - hoppscotch_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "hoppscotch"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - oktarion_ngg
+
+  hoppscotch-migration:
+    image: hoppscotch/hoppscotch:latest
+    container_name: hoppscotch-migration
+    depends_on:
+      hoppscotch-db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://hoppscotch:hoppscotch@hoppscotch-db:5432/hoppscotch
+    command: sh -c "npx prisma migrate deploy"
+    networks:
+      - oktarion_ngg
+
+  hoppscotch:
+    image: hoppscotch/hoppscotch:latest
+    container_name: hoppscotch
+    restart: always
+    depends_on:
+      hoppscotch-migration:
+        condition: service_completed_successfully
+    ports:
+      - "3100:3000"
+      - "3101:3100"
+      - "3170:3170"
+    environment:
+      - DATABASE_URL=postgresql://hoppscotch:hoppscotch@hoppscotch-db:5432/hoppscotch
+      - DATA_ENCRYPTION_KEY=super-secret-key-you-must-change
+      - WHITELISTED_ORIGINS=http://localhost:3100,http://localhost:3000
+      - VITE_BASE_URL=http://localhost:3000
+      - VITE_SHORTCODE_BASE_URL=http://localhost:3000
+      - VITE_ADMIN_URL=http://localhost:3101
+      - VITE_BACKEND_GQL_URL=http://localhost:3170/graphql
+      - VITE_BACKEND_WS_URL=ws://localhost:3170/graphql
+      - VITE_BACKEND_API_URL=http://localhost:3170/v1
+    networks:
+      - oktarion_ngg
+
+  # pgAdmin
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5050
+      - PGPASSFILE=/pgpass
+    ports:
+      - "5050:5050"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+      - ./pgadmin/pgpass:/pgpass:ro
+    networks:
+      - oktarion_ngg
+
+  # Portainer
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "9001:9000"
+      - "8003:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - oktarion_ngg
+
+  # Dozzle (container logs viewer)
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: always
+    ports:
+      - "9999:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - oktarion_ngg
+
+  # Redis Commander (web UI for Redis)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: redis-commander
+    restart: always
+    environment:
+      - REDIS_HOSTS=cache:cache-db:6379:0:redispass
+    ports:
+      - "8082:8081"
+    networks:
+      - oktarion_ngg
+
+  # Mongo Express (web UI for MongoDB)
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express
+    restart: always
+    environment:
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_SERVER=alternative-db
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    ports:
+      - "8781:8081"
+    networks:
+      - oktarion_ngg
+
+volumes:
+  hoppscotch_db_data:
+  pgadmin_data:
+  portainer_data:
+
+networks:
+  oktarion_ngg:
+    external: true
+

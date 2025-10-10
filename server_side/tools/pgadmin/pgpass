@@ -1,0 +1,4 @@
+contact_postgres:5432:*:contactuser:contactpass
+conversation_postgres:5432:*:conversationuser:conversationpass
+hoppscotch-db:5432:*:hoppscotch:hoppscotch
+
