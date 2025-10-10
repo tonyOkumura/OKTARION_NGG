@@ -1,6 +1,6 @@
-package com.example.task.plugin
+package com.task_micro.plugin
 
-import com.example.config.getAppConfig
+import com.task_micro.config.getAppConfig
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*

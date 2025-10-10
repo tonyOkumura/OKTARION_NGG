@@ -1,12 +1,12 @@
-package com.example.controller
+package com.message_micro.controller
 
-import com.example.model.City
-import com.example.model.CityService
-import com.example.plugin.validateCity
-import com.example.plugin.respondValidationError
-import com.example.plugin.respondInternalError
-import com.example.plugin.respondBadRequest
-import com.example.plugin.respondNotFound
+import com.message_micro.model.City
+import com.message_micro.model.CityService
+import com.message_micro.plugin.validateCity
+import com.message_micro.plugin.respondValidationError
+import com.message_micro.plugin.respondInternalError
+import com.message_micro.plugin.respondBadRequest
+import com.message_micro.plugin.respondNotFound
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*

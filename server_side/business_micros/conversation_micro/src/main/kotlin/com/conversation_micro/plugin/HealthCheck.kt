@@ -1,6 +1,6 @@
-package com.example.conversation.plugin
+package com.conversation_micro.plugin
 
-import com.example.config.getAppConfig
+import com.conversation_micro.config.getAppConfig
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*

@@ -1,13 +1,10 @@
-package com.example.contact.plugin
+package com.contact_micro.plugin
 
 import com.contact_micro.config.getAppConfig
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
-import io.ktor.server.plugins.requestvalidation.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
 
 fun Application.configureSecurity() {
     val config = getAppConfig()

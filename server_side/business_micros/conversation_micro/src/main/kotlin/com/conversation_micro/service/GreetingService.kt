@@ -1,4 +1,4 @@
-package com.example.service
+package com.conversation_micro.service
 
 fun interface GreetingService {
     fun sayHello(): String

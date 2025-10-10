@@ -1,4 +1,4 @@
-package com.example.config
+package com.contact_micro.config
 
 import io.ktor.server.application.*
 

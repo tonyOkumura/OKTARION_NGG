@@ -1,11 +1,10 @@
-package com.example.infrastructure
+package com.event_micro.infrastructure
 
-import com.example.config.getAppConfig
-import com.example.controller.configureCitiesRouting
+import com.event_micro.config.getAppConfig
+import com.event_micro.controller.configureCitiesRouting
 import io.ktor.server.application.*
 import java.sql.Connection
 import java.sql.DriverManager
-import org.slf4j.LoggerFactory
 
 fun Application.configureDatabases() {
     val dbConnection: Connection = connectToPostgres(embedded = false)

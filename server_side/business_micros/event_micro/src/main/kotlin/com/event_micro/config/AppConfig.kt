@@ -1,4 +1,4 @@
-package com.example.config
+package com.event_micro.config
 
 import io.ktor.server.application.*
 

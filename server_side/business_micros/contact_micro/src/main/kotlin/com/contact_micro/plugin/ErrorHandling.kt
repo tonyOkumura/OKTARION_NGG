@@ -1,8 +1,9 @@
-package com.example.contact.plugin
+package com.contact_micro.plugin
 
-import com.example.model.ErrorResponse
-import com.example.model.StandardErrors
-import com.example.model.ValidationErrorResponse
+import com.contact_micro.model.ErrorResponse
+import com.contact_micro.model.StandardErrors
+import com.contact_micro.model.ValidationError
+import com.contact_micro.model.ValidationErrorResponse
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.statuspages.*
@@ -105,7 +106,7 @@ suspend fun ApplicationCall.respondNotFound(message: String = "Resource not foun
     respond(HttpStatusCode.NotFound, errorResponse)
 }
 
-suspend fun ApplicationCall.respondValidationError(message: String, validationErrors: List<com.example.model.ValidationError>) {
+suspend fun ApplicationCall.respondValidationError(message: String, validationErrors: List<ValidationError>) {
     val errorResponse = ValidationErrorResponse(
         message = message,
         timestamp = System.currentTimeMillis(),

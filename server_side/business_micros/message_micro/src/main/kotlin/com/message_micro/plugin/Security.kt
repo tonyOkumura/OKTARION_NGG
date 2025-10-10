@@ -1,13 +1,10 @@
-package com.example.message.plugin
+package com.message_micro.plugin
 
-import com.example.config.getAppConfig
+import com.message_micro.config.getAppConfig
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
-import io.ktor.server.plugins.requestvalidation.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
 
 fun Application.configureSecurity() {
     val config = getAppConfig()

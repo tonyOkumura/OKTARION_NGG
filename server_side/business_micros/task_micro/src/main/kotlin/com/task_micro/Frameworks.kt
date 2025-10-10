@@ -1,6 +1,6 @@
-package com.example
+package com.task_micro
 
-import com.example.service.GreetingService
+import com.task_micro.service.GreetingService
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 

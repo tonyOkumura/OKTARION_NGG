@@ -1,16 +1,14 @@
-package com.example
+package com.message_micro
 
-import com.example.config.getAppConfig
-import com.example.plugin.configureLogging
-import com.example.plugin.configureSecurity
-import com.example.plugin.configureSerialization
-import com.example.plugin.configureValidation
-import com.example.plugin.configureGracefulShutdown
-import com.example.plugin.configureErrorHandling
-import com.example.infrastructure.configureDatabases
-import com.example.plugin.configureHealthCheck
-import com.example.configureRouting
-import com.example.configureFrameworks
+import com.message_micro.config.getAppConfig
+import com.message_micro.plugin.configureLogging
+import com.message_micro.plugin.configureSecurity
+import com.message_micro.plugin.configureSerialization
+import com.message_micro.plugin.configureValidation
+import com.message_micro.plugin.configureGracefulShutdown
+import com.message_micro.plugin.configureErrorHandling
+import com.message_micro.infrastructure.configureDatabases
+import com.message_micro.plugin.configureHealthCheck
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*

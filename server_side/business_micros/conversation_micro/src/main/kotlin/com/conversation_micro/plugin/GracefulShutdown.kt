@@ -1,10 +1,8 @@
-package com.example.conversation.plugin
+package com.conversation_micro.plugin
 
-import com.example.config.getAppConfig
+import com.conversation_micro.config.getAppConfig
 import io.ktor.server.application.*
 import kotlinx.coroutines.*
-import java.sql.Connection
-import java.util.concurrent.TimeUnit
 
 fun Application.configureGracefulShutdown() {
     val config = getAppConfig()

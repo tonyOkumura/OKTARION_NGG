@@ -4,11 +4,11 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
 }
 
-group = "com.example"
+group = "com.contact_micro"
 version = "0.0.1"
 
 application {
-    mainClass = "com.example.ApplicationKt"
+    mainClass = "com.contact_micro.ApplicationKt"
 }
 
 dependencies {

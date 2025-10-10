@@ -1,6 +1,6 @@
-package com.example
+package com.event_micro
 
-import com.example.service.GreetingService
+import com.event_micro.service.GreetingService
 import io.ktor.server.application.*
 import io.ktor.server.plugins.di.*
 

@@ -1,10 +1,10 @@
-package com.example.task.plugin
+package com.task_micro.plugin
 
-import com.example.config.getAppConfig
+import com.task_micro.config.getAppConfig
+import com.task_micro.plugin.logError
+import com.task_micro.plugin.logInfo
 import io.ktor.server.application.*
 import kotlinx.coroutines.*
-import java.sql.Connection
-import java.util.concurrent.TimeUnit
 
 fun Application.configureGracefulShutdown() {
     val config = getAppConfig()

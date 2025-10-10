@@ -1,11 +1,10 @@
-package com.task_micro.infrastructure
+package com.contact_micro.infrastructure
 
-import com.task_micro.config.getAppConfig
-import com.task_micro.controller.configureCitiesRouting
+import com.contact_micro.config.getAppConfig
+import com.contact_micro.controller.configureCitiesRouting
 import io.ktor.server.application.*
 import java.sql.Connection
 import java.sql.DriverManager
-import org.slf4j.LoggerFactory
 
 fun Application.configureDatabases() {
     val dbConnection: Connection = connectToPostgres(embedded = false)

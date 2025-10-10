@@ -1,6 +1,6 @@
-package com.example.message.plugin
+package com.message_micro.plugin
 
-import com.example.config.getAppConfig
+import com.message_micro.config.getAppConfig
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*

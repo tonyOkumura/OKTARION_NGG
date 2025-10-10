@@ -1,13 +1,9 @@
-package com.example.message.plugin
+package com.message_micro.plugin
 
-import com.example.model.City
-import com.example.model.ValidationError
-import io.ktor.http.*
+import com.message_micro.model.City
+import com.message_micro.model.ValidationError
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import kotlinx.serialization.Serializable
 
 // City data class is defined in CitySchema.kt
 

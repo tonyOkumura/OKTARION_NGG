@@ -1,16 +1,14 @@
-package com.example
+package com.task_micro
 
-import com.example.config.getAppConfig
-import com.example.plugin.configureLogging
-import com.example.plugin.configureSecurity
-import com.example.plugin.configureSerialization
-import com.example.plugin.configureValidation
-import com.example.plugin.configureGracefulShutdown
-import com.example.plugin.configureErrorHandling
-import com.example.infrastructure.configureDatabases
-import com.example.plugin.configureHealthCheck
-import com.example.configureRouting
-import com.example.configureFrameworks
+import com.task_micro.config.getAppConfig
+import com.task_micro.plugin.configureLogging
+import com.task_micro.plugin.configureSecurity
+import com.task_micro.plugin.configureSerialization
+import com.task_micro.plugin.configureValidation
+import com.task_micro.plugin.configureGracefulShutdown
+import com.task_micro.plugin.configureErrorHandling
+import com.task_micro.infrastructure.configureDatabases
+import com.task_micro.plugin.configureHealthCheck
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*

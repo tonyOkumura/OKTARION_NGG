@@ -1,4 +1,4 @@
-package com.example.model
+package com.event_micro.model
 
 import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable

@@ -1,20 +1,20 @@
-package com.example.task.plugin
+package com.task_micro.plugin
 
-import com.example.config.getAppConfig
-import io.ktor.http.*
+import com.task_micro.config.getAppConfig
 import io.ktor.server.application.*
 import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
+import org.slf4j.event.Level
 import java.util.*
 
 fun Application.configureLogging() {
     val config = getAppConfig()
     
     install(CallLogging) {
-        level = org.slf4j.event.Level.valueOf(config.logging.level)
+        level = Level.valueOf(config.logging.level)
         format { call ->
             val correlationId = call.request.header("X-Correlation-ID") ?: generateCorrelationId()
             MDC.put("correlationId", correlationId)
@@ -34,8 +34,8 @@ fun generateCorrelationId(): String {
     return UUID.randomUUID().toString().substring(0, 8)
 }
 
-fun Application.logger(): org.slf4j.Logger {
-    return LoggerFactory.getLogger("com.example.${this::class.simpleName}")
+fun Application.logger(): Logger {
+    return LoggerFactory.getLogger("com.task_micro.${this::class.simpleName}")
 }
 
 // Extension functions for structured logging
