@@ -29,6 +29,7 @@ fun Application.module() {
     configureLogging()
     configureSecurity()
     configureSerialization()
+    configureUserAuthentication()
     configureValidation()
     configureErrorHandling()
     configureGracefulShutdown()
