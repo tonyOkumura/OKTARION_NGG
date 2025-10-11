@@ -29,6 +29,7 @@ fun Application.configureSecurity() {
             allowHeader(HttpHeaders.Authorization)
             allowHeader("X-Correlation-ID")
             allowHeader("X-Request-ID")
+            allowHeader("Okta-User-ID")
             
             config.security.corsOrigins.forEach { origin ->
                 if (origin == "*") {
