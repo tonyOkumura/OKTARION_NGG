@@ -1,16 +1,17 @@
 package com.contact_micro.infrastructure
 
 import com.contact_micro.config.getAppConfig
-import com.contact_micro.controller.configureCitiesRouting
+import com.contact_micro.controller.configureContactRouting
 import io.ktor.server.application.*
 import java.sql.Connection
 import java.sql.DriverManager
 
 fun Application.configureDatabases() {
+    val config = getAppConfig()
     val dbConnection: Connection = connectToPostgres(embedded = false)
     
-    // Configure cities routing with database connection
-    configureCitiesRouting(dbConnection)
+    // Configure contacts routing with database connection and pagination config
+    configureContactRouting(dbConnection, config.pagination)
     
     // Kafka configuration temporarily disabled
     // install(Kafka) {

@@ -1,22 +1,29 @@
--- Создание таблицы cities
-CREATE TABLE IF NOT EXISTS cities (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    country VARCHAR(255) NOT NULL,
-    population INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS contacts (
+  id UUID PRIMARY KEY,
+  username VARCHAR(255) UNIQUE NOT NULL,
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  display_name VARCHAR(255),
+  email VARCHAR(255) UNIQUE,
+  phone VARCHAR(30) UNIQUE,
+  is_online BOOLEAN NOT NULL DEFAULT false,
+  last_seen_at TIMESTAMP,
+  status_message VARCHAR(255),
+  role VARCHAR(20) NOT NULL DEFAULT 'user',
+  department VARCHAR(255),
+  rank VARCHAR(100),
+  position VARCHAR(255),
+  company VARCHAR(255),
+  avatar_file_id UUID,
+  date_of_birth DATE,
+  locale VARCHAR(10) DEFAULT 'ru',
+  timezone TEXT DEFAULT 'Europe/Moscow',
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Создание индексов
-CREATE INDEX IF NOT EXISTS idx_cities_name ON cities(name);
-CREATE INDEX IF NOT EXISTS idx_cities_country ON cities(country);
+CREATE UNIQUE INDEX ON contacts (username);
 
--- Вставка тестовых данных
-INSERT INTO cities (name, country, population) VALUES 
-('Moscow', 'Russia', 12615000),
-('Saint Petersburg', 'Russia', 5383000),
-('Novosibirsk', 'Russia', 1625000),
-('Yekaterinburg', 'Russia', 1495000),
-('Kazan', 'Russia', 1257000)
-ON CONFLICT DO NOTHING;
+CREATE UNIQUE INDEX ON contacts (email);
+
+CREATE UNIQUE INDEX ON contacts (phone);
