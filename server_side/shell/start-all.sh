@@ -12,8 +12,14 @@
 
 set -e
 
+# Рекомендуемый порядок запуска для оптимальной работы системы:
+# 1. Cache (Redis) - кэш-сервер для повышения производительности
+# 2. Supabase - Identity Provider для аутентификации
+# 3. Микросервисы - бизнес-логика приложения
+# 4. Tools - инструменты разработки
+
 # Доступные микросервисы
-AVAILABLE_SERVICES=("contact" "conversation" "message" "task" "event" "tools")
+AVAILABLE_SERVICES=("contact" "conversation" "message" "task" "event" "tools" "supabase" "cache")
 
 # Функция для показа справки
 show_help() {
@@ -32,6 +38,12 @@ show_help() {
     echo "  $0 contact event      # запустить только contact и event"
     echo "  $0 all                # запустить все микросервисы"
     echo "  $0 tools              # запустить только инструменты"
+    echo ""
+    echo "Рекомендуемый порядок запуска:"
+    echo "  1. Cache (Redis) - кэш-сервер"
+    echo "  2. Supabase - Identity Provider"
+    echo "  3. Микросервисы - бизнес-логика"
+    echo "  4. Tools - инструменты разработки"
     echo ""
 }
 
@@ -149,6 +161,27 @@ for service in "${SERVICES_TO_START[@]}"; do
     esac
 done
 
+# Функция для запуска сервисов в оптимальном порядке
+start_services_optimized() {
+    local services=("$@")
+    local optimized_order=("cache" "supabase" "contact" "conversation" "message" "task" "event" "tools")
+    local services_to_start=()
+    
+    # Определяем порядок запуска на основе оптимизированного порядка
+    for optimized_service in "${optimized_order[@]}"; do
+        for service in "${services[@]}"; do
+            if [[ "$service" == "$optimized_service" ]]; then
+                services_to_start+=("$service")
+            fi
+        done
+    done
+    
+    # Запускаем сервисы в оптимальном порядке
+    for service in "${services_to_start[@]}"; do
+        start_service "$service"
+    done
+}
+
 # Функция для запуска микросервиса
 start_service() {
     local service=$1
@@ -180,6 +213,14 @@ start_service() {
             service_name="Инструменты разработки"
             service_dir="$(dirname "$0")/../tools"
             ;;
+        "supabase")
+            service_name="Supabase (Identity Provider)"
+            service_dir="$(dirname "$0")/../supabase-okta-auth"
+            ;;
+        "cache")
+            service_name="Cache (Redis)"
+            service_dir="$(dirname "$0")/../cache"
+            ;;
     esac
     
     log "Запуск $service_name..."
@@ -197,10 +238,8 @@ start_service() {
     cd - > /dev/null
 }
 
-# Запуск выбранных сервисов
-for service in "${SERVICES_TO_START[@]}"; do
-    start_service "$service"
-done
+# Запуск выбранных сервисов в оптимальном порядке
+start_services_optimized "${SERVICES_TO_START[@]}"
 
 # Ожидание готовности сервисов
 log "Ожидание готовности сервисов..."
@@ -248,6 +287,15 @@ for service in "${SERVICES_TO_START[@]}"; do
         "event")
             echo "• Event Microservice: http://localhost:8048"
             echo "• Event DB (PostgreSQL): localhost:5440"
+            ;;
+        "supabase")
+            echo "• Supabase Studio: http://localhost:54323"
+            echo "• Supabase API: http://localhost:54321"
+            echo "• Supabase DB: localhost:54322"
+            ;;
+        "cache")
+            echo "• Redis Cache: localhost:6379"
+            echo "• Redis Commander: http://localhost:8082"
             ;;
     esac
 done

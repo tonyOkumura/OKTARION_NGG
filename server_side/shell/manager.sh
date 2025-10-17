@@ -7,7 +7,7 @@
 set -e
 
 # Доступные микросервисы
-AVAILABLE_SERVICES=("contact" "conversation" "message" "task" "event" "tools")
+AVAILABLE_SERVICES=("contact" "conversation" "message" "task" "event" "tools" "supabase" "cache")
 
 # Цвета для вывода
 RED='\033[0;31m'
@@ -94,6 +94,8 @@ select_services() {
             "task") service_name="Task" ;;
             "event") service_name="Event" ;;
             "tools") service_name="Инструменты разработки" ;;
+            "supabase") service_name="Supabase (Identity Provider)" ;;
+            "cache") service_name="Cache (Redis)" ;;
         esac
         
         echo -e "${GREEN}$((i+1)).${NC} $service_name ($service)"
@@ -181,10 +183,10 @@ stop_services() {
 
 # Функция для пересборки сервисов
 rebuild_services() {
-    # Фильтруем tools из доступных сервисов для пересборки
+    # Фильтруем tools и supabase из доступных сервисов для пересборки
     local rebuildable_services=()
     for service in "${AVAILABLE_SERVICES[@]}"; do
-        if [[ "$service" != "tools" ]]; then
+        if [[ "$service" != "tools" && "$service" != "supabase" ]]; then
             rebuildable_services+=("$service")
         fi
     done
@@ -319,6 +321,8 @@ show_logs() {
             "task") service_name="Task" ;;
             "event") service_name="Event" ;;
             "tools") service_name="Инструменты разработки" ;;
+            "supabase") service_name="Supabase (Identity Provider)" ;;
+            "cache") service_name="Cache (Redis)" ;;
         esac
         
         echo -e "${GREEN}$((i+1)).${NC} $service_name ($service)"
@@ -347,6 +351,8 @@ show_logs() {
             "task") service_name="Task" ;;
             "event") service_name="Event" ;;
             "tools") service_name="Инструменты разработки" ;;
+            "supabase") service_name="Supabase (Identity Provider)" ;;
+            "cache") service_name="Cache (Redis)" ;;
         esac
         
         show_header
@@ -362,6 +368,8 @@ show_logs() {
             "task") container_name="task_micro" ;;
             "event") container_name="event_micro" ;;
             "tools") container_name="hoppscotch" ;; # Пример для tools
+            "supabase") container_name="supabase-studio" ;; # Основной контейнер Supabase
+            "cache") container_name="cache_db" ;; # Контейнер Redis
         esac
         
         # Показать логи
@@ -437,6 +445,19 @@ show_useful_commands() {
     echo -e "  • Подключение к Message DB: ${BLUE}docker exec -it message_postgres psql -U messageuser -d messagedb${NC}"
     echo -e "  • Подключение к Task DB: ${BLUE}docker exec -it task_postgres psql -U taskuser -d taskdb${NC}"
     echo -e "  • Подключение к Event DB: ${BLUE}docker exec -it event_postgres psql -U eventuser -d eventdb${NC}"
+    echo ""
+    
+    echo -e "${CYAN}Supabase (Identity Provider):${NC}"
+    echo -e "  • Supabase Studio: ${BLUE}http://localhost:54323${NC}"
+    echo -e "  • Supabase API: ${BLUE}http://localhost:54321${NC}"
+    echo -e "  • Supabase DB: ${BLUE}localhost:54322${NC}"
+    echo -e "  • Подключение к Supabase DB: ${BLUE}docker exec -it supabase-db psql -U postgres -d postgres${NC}"
+    echo ""
+    
+    echo -e "${CYAN}Cache (Redis):${NC}"
+    echo -e "  • Redis Cache: ${BLUE}localhost:6379${NC}"
+    echo -e "  • Redis Commander: ${BLUE}http://localhost:8082${NC}"
+    echo -e "  • Подключение к Redis: ${BLUE}docker exec -it cache_db redis-cli -a cachepass${NC}"
     echo ""
     
     echo -e "${CYAN}Сети Docker:${NC}"
@@ -525,6 +546,7 @@ cleanup_system() {
                 "task") service_name="Task" ;;
                 "event") service_name="Event" ;;
                 "tools") service_name="Инструменты разработки" ;;
+            "supabase") service_name="Supabase (Identity Provider)" ;;
             esac
             
             echo -e "${GREEN}$((i+1)).${NC} $service_name ($service)"

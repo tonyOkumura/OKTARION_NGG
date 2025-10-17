@@ -19,7 +19,7 @@ set -e
 CLEANUP_TYPES=("containers" "images" "volumes" "networks" "builds" "all")
 
 # Доступные микросервисы
-AVAILABLE_SERVICES=("contact" "conversation" "message" "task" "event" "tools")
+AVAILABLE_SERVICES=("contact" "conversation" "message" "task" "event" "tools" "supabase" "cache")
 
 # Цвета для вывода
 RED='\033[0;31m'
@@ -146,6 +146,8 @@ get_container_name() {
         "task") echo "task_microservice" ;;
         "event") echo "event_microservice" ;;
         "tools") echo "hoppscotch" ;; # Пример для tools
+        "supabase") echo "supabase-studio" ;; # Основной контейнер Supabase
+        "cache") echo "cache_db" ;; # Контейнер Redis
     esac
 }
 
@@ -159,6 +161,8 @@ get_image_name() {
         "task") echo "task_micro-task-service" ;;
         "event") echo "event_micro-event-service" ;;
         "tools") echo "hoppscotch" ;; # Пример для tools
+        "supabase") echo "supabase/studio" ;; # Основной образ Supabase
+        "cache") echo "redis" ;; # Образ Redis
     esac
 }
 
@@ -172,6 +176,8 @@ get_volume_name() {
         "task") echo "task_postgres_data" ;;
         "event") echo "event_postgres_data" ;;
         "tools") echo "hoppscotch_data" ;; # Пример для tools
+        "supabase") echo "supabase_db_data" ;; # Volume для данных Supabase
+        "cache") echo "cache_data" ;; # Volume для данных Redis
     esac
 }
 
@@ -185,6 +191,8 @@ get_network_name() {
         "task") echo "oktarion_tasks_net" ;;
         "event") echo "oktarion_events_net" ;;
         "tools") echo "oktarion_ngg" ;; # Общая сеть
+        "supabase") echo "supabase_default" ;; # Сеть Supabase
+        "cache") echo "oktarion_ngg" ;; # Общая сеть
     esac
 }
 
@@ -205,6 +213,8 @@ cleanup_containers() {
             "task") service_name="Task" ;;
             "event") service_name="Event" ;;
             "tools") service_name="Tools" ;;
+            "supabase") service_name="Supabase" ;;
+            "cache") service_name="Cache" ;;
         esac
         
         log "Остановка и удаление контейнеров $service_name..."
@@ -255,6 +265,8 @@ cleanup_images() {
             "task") service_name="Task" ;;
             "event") service_name="Event" ;;
             "tools") service_name="Tools" ;;
+            "supabase") service_name="Supabase" ;;
+            "cache") service_name="Cache" ;;
         esac
         
         log "Удаление образов $service_name..."
@@ -304,6 +316,8 @@ cleanup_volumes() {
             "task") service_name="Task" ;;
             "event") service_name="Event" ;;
             "tools") service_name="Tools" ;;
+            "supabase") service_name="Supabase" ;;
+            "cache") service_name="Cache" ;;
         esac
         
         log "Удаление volumes $service_name..."
@@ -353,6 +367,8 @@ cleanup_networks() {
             "task") service_name="Task" ;;
             "event") service_name="Event" ;;
             "tools") service_name="Tools" ;;
+            "supabase") service_name="Supabase" ;;
+            "cache") service_name="Cache" ;;
         esac
         
         log "Удаление сети $service_name..."

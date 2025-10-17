@@ -11,7 +11,7 @@
 
 set -e
 
-# Доступные микросервисы (без tools, так как они не пересобираются)
+# Доступные микросервисы (без tools и supabase, так как они не пересобираются)
 AVAILABLE_SERVICES=("contact" "conversation" "message" "task" "event")
 
 # Функция для показа справки

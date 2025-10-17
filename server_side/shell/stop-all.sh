@@ -13,7 +13,7 @@
 set -e
 
 # Доступные микросервисы
-AVAILABLE_SERVICES=("contact" "conversation" "message" "task" "event" "tools")
+AVAILABLE_SERVICES=("contact" "conversation" "message" "task" "event" "tools" "supabase" "cache")
 
 # Функция для показа справки
 show_help() {
@@ -128,6 +128,14 @@ stop_service() {
         "tools")
             service_name="Инструменты разработки"
             service_dir="$(dirname "$0")/../tools"
+            ;;
+        "supabase")
+            service_name="Supabase (Identity Provider)"
+            service_dir="$(dirname "$0")/../supabase-okta-auth"
+            ;;
+        "cache")
+            service_name="Cache (Redis)"
+            service_dir="$(dirname "$0")/../cache"
             ;;
     esac
     

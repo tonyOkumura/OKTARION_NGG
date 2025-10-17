@@ -1,0 +1,43 @@
+services:
+  # Redis Cache Database
+  cache_db:
+    image: redis:7-alpine
+    container_name: cache_db
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_MAX_MEMORY=${REDIS_MAX_MEMORY}
+      - REDIS_LOG_LEVEL=${REDIS_LOG_LEVEL}
+    command: |
+      redis-server 
+      --requirepass ${REDIS_PASSWORD}
+      --maxmemory ${REDIS_MAX_MEMORY}
+      --maxmemory-policy ${REDIS_MAX_MEMORY_POLICY}
+      --save ${REDIS_SAVE_900_1}
+      --save ${REDIS_SAVE_300_10}
+      --save ${REDIS_SAVE_60_10000}
+      --appendonly ${REDIS_APPEND_ONLY}
+      --appendfsync ${REDIS_APPEND_FSYNC}
+      --loglevel ${REDIS_LOG_LEVEL}
+      --tcp-keepalive ${REDIS_TCP_KEEPALIVE}
+      --timeout ${REDIS_TIMEOUT}
+      --protected-mode ${REDIS_PROTECTED_MODE}
+      --bind ${REDIS_BIND}
+    volumes:
+      - cache_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - oktarion_ngg
+
+volumes:
+  cache_data:
+
+networks:
+  oktarion_ngg:
+    external: true
