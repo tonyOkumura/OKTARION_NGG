@@ -125,6 +125,41 @@ class ContactService(private val connection: Connection, private val paginationC
         }
     }
     
+    // Read contacts by multiple IDs
+    suspend fun readByIds(ids: List<String>): List<Contact> = withContext(Dispatchers.IO) {
+        if (ids.isEmpty()) {
+            return@withContext emptyList()
+        }
+        
+        // Создаем плейсхолдеры для SQL запроса
+        val placeholders = ids.joinToString(",") { "?" }
+        val query = """
+            SELECT id, username, first_name, last_name, display_name, email, phone, 
+                   is_online, last_seen_at, status_message, role, department, rank, 
+                   position, company, avatar_file_id, date_of_birth, locale, timezone, 
+                   created_at, updated_at
+            FROM contacts 
+            WHERE id IN ($placeholders)
+            ORDER BY created_at DESC
+        """
+        
+        val statement = connection.prepareStatement(query)
+        
+        // Устанавливаем параметры для каждого ID
+        ids.forEachIndexed { index, id ->
+            statement.setObject(index + 1, UUID.fromString(id))
+        }
+        
+        val resultSet = statement.executeQuery()
+        val contacts = mutableListOf<Contact>()
+        
+        while (resultSet.next()) {
+            contacts.add(mapResultSetToContact(resultSet))
+        }
+        
+        return@withContext contacts
+    }
+    
     // Read all contacts with search and pagination
     suspend fun readAll(searchQuery: String? = null, cursor: String? = null, limit: Int? = null): ContactSearchResponse = withContext(Dispatchers.IO) {
         val actualLimit = limit ?: paginationConfig.defaultLimit

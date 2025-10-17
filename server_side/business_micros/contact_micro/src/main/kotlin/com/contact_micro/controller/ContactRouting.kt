@@ -2,6 +2,7 @@ package com.contact_micro.controller
 
 import com.contact_micro.model.ContactCreateRequest
 import com.contact_micro.model.ContactUpdateRequest
+import com.contact_micro.model.ContactSearchResponse
 import com.contact_micro.service.ContactService
 import com.contact_micro.config.PaginationConfig
 import com.contact_micro.plugin.validateContactCreate
@@ -23,17 +24,8 @@ fun Application.configureContactRouting(dbConnection: Connection, paginationConf
     val contactService = ContactService(dbConnection, paginationConfig)
     
     routing {
-        // Обработка CORS preflight запросов для contacts
-        options("/contacts") {
-            call.respond(HttpStatusCode.OK)
-        }
-        
-        options("/contacts/{id}") {
-            call.respond(HttpStatusCode.OK)
-        }
-        
         // Create contact
-        post("/contacts") {
+        post("/") {
             try {
                 val userId = call.getUserId()
                 call.logWithUser("info", "Creating new contact")
@@ -57,22 +49,61 @@ fun Application.configureContactRouting(dbConnection: Connection, paginationConf
             }
         }
 
-        // Read all contacts with search and pagination
-        get("/contacts") {
+        // Read all contacts with search and pagination, or by specific IDs
+        get("/") {
             try {
                 val userId = call.getUserId()
                 
-                        // Получаем параметры запроса
-                        val searchQuery = call.request.queryParameters["search"]
-                        val cursor = call.request.queryParameters["cursor"]
-                        val limitParam = call.request.queryParameters["limit"]?.toIntOrNull()
-                        val limit = if (limitParam != null && limitParam in 1..paginationConfig.maxLimit) limitParam else null
+                // Получаем параметры запроса
+                val searchQuery = call.request.queryParameters["search"]
+                val cursor = call.request.queryParameters["cursor"]
+                val limitParam = call.request.queryParameters["limit"]?.toIntOrNull()
+                val limit = if (limitParam != null && limitParam in 1..paginationConfig.maxLimit) limitParam else null
+                
+                // Получаем параметр ids для поиска по конкретным ID
+                val idsParam = call.request.queryParameters["ids"]
+                val ids = if (idsParam != null) {
+                    idsParam.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+                } else null
 
-                        call.logWithUser("info", "Searching contacts: query='$searchQuery', cursor='$cursor', limit=$limit")
+                // Если указаны конкретные ID, используем поиск по ID
+                if (ids != null) {
+                    if (ids.isEmpty()) {
+                        call.logWithUser("warn", "Empty IDs list provided")
+                        call.respondBadRequest("IDs list cannot be empty")
+                        return@get
+                    }
+                    
+                    if (ids.size > 100) {
+                        call.logWithUser("warn", "Too many IDs provided: ${ids.size}")
+                        call.respondBadRequest("Maximum 100 IDs allowed per request")
+                        return@get
+                    }
+                    
+                    call.logWithUser("info", "Reading ${ids.size} contacts by IDs")
+                    
+                    val contacts = contactService.readByIds(ids)
+                    call.logWithUser("info", "Retrieved ${contacts.size} contacts out of ${ids.size} requested")
+                    
+                    // Возвращаем результат в том же формате, что и обычный поиск
+                    val result = ContactSearchResponse(
+                        contacts = contacts,
+                        hasMore = false, // Поиск по ID не поддерживает пагинацию
+                        nextCursor = null,
+                        totalCount = contacts.size
+                    )
+                    call.respond(HttpStatusCode.OK, result)
+                } else {
+                    // Обычный поиск с пагинацией
+                    call.logWithUser("info", "Searching contacts: query='$searchQuery', cursor='$cursor', limit=$limit")
 
-                        val result = contactService.readAll(searchQuery, cursor, limit)
-                call.logWithUser("info", "Retrieved ${result.contacts.size} contacts, hasMore=${result.hasMore}")
-                call.respond(HttpStatusCode.OK, result)
+                    val result = contactService.readAll(searchQuery, cursor, limit)
+                    call.logWithUser("info", "Retrieved ${result.contacts.size} contacts, hasMore=${result.hasMore}")
+                    call.respond(HttpStatusCode.OK, result)
+                }
+            } catch (e: IllegalArgumentException) {
+                call.logWithUser("warn", "Invalid request parameters: ${e.message}")
+                call.respondBadRequest(e.message ?: "Invalid request parameters")
             } catch (e: Exception) {
                 call.logWithUser("error", "Failed to read contacts: ${e.message}")
                 call.respondInternalError("Failed to read contacts: ${e.message}")
@@ -80,7 +111,7 @@ fun Application.configureContactRouting(dbConnection: Connection, paginationConf
         }
 
         // Read contact by ID
-        get("/contacts/{id}") {
+        get("/{id}") {
             try {
                 val userId = call.getUserId()
                 val id = call.parameters["id"] 
@@ -106,7 +137,7 @@ fun Application.configureContactRouting(dbConnection: Connection, paginationConf
         }
 
         // Update contact
-        put("/contacts/{id}") {
+        put("/{id}") {
             try {
                 val userId = call.getUserId()
                 val id = call.parameters["id"] 
@@ -137,7 +168,7 @@ fun Application.configureContactRouting(dbConnection: Connection, paginationConf
         }
 
         // Delete contact
-        delete("/contacts/{id}") {
+        delete("/{id}") {
             try {
                 val userId = call.getUserId()
                 val id = call.parameters["id"] 
