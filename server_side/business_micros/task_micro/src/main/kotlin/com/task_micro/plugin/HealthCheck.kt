@@ -5,8 +5,8 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import java.sql.Connection
-import java.sql.DriverManager
+import org.litote.kmongo.coroutine.coroutine
+import org.litote.kmongo.reactivestreams.KMongo
 import kotlinx.serialization.Serializable
 
 fun Application.configureHealthCheck() {
@@ -65,16 +65,14 @@ private fun Application.checkHealth(): HealthStatus {
     
     // Database check
     try {
-        val dbConnection = getDatabaseConnection()
-        if (dbConnection != null && !dbConnection.isClosed) {
-            val statement = dbConnection.createStatement()
-            statement.executeQuery("SELECT 1")
-            checks["database"] = CheckResult("UP", "Database connection successful")
+        val mongoClient = getDatabaseConnection()
+        if (mongoClient != null) {
+            checks["database"] = CheckResult("UP", "MongoDB connection successful")
         } else {
-            checks["database"] = CheckResult("DOWN", "Database connection failed")
+            checks["database"] = CheckResult("DOWN", "MongoDB connection failed")
         }
     } catch (e: Exception) {
-        checks["database"] = CheckResult("DOWN", "Database error: ${e.message}")
+        checks["database"] = CheckResult("DOWN", "MongoDB error: ${e.message}")
     }
     
     // Application check
@@ -92,16 +90,14 @@ private fun Application.checkReadiness(): ReadinessStatus {
     
     // Database readiness
     try {
-        val dbConnection = getDatabaseConnection()
-        if (dbConnection != null && !dbConnection.isClosed) {
-            val statement = dbConnection.createStatement()
-            statement.executeQuery("SELECT 1")
-            checks["database"] = CheckResult("UP", "Database is ready")
+        val mongoClient = getDatabaseConnection()
+        if (mongoClient != null) {
+            checks["database"] = CheckResult("UP", "MongoDB is ready")
         } else {
-            checks["database"] = CheckResult("DOWN", "Database not ready")
+            checks["database"] = CheckResult("DOWN", "MongoDB not ready")
         }
     } catch (e: Exception) {
-        checks["database"] = CheckResult("DOWN", "Database not ready: ${e.message}")
+        checks["database"] = CheckResult("DOWN", "MongoDB not ready: ${e.message}")
     }
     
     return ReadinessStatus(
@@ -111,10 +107,10 @@ private fun Application.checkReadiness(): ReadinessStatus {
     )
 }
 
-private fun Application.getDatabaseConnection(): Connection? {
+private fun Application.getDatabaseConnection(): org.litote.kmongo.coroutine.CoroutineClient? {
     return try {
         val config = getAppConfig()
-        DriverManager.getConnection(config.database.url, config.database.user, config.database.password)
+        KMongo.createClient(config.database.connectionString).coroutine
     } catch (e: Exception) {
         null
     }

@@ -34,28 +34,6 @@
       "SSLMode": "prefer"
     },
     "4": {
-      "Name": "Task Micro DB",
-      "Group": "Servers",
-      "Host": "task_postgres",
-      "Port": 5432,
-      "MaintenanceDB": "taskdb",
-      "Username": "taskuser",
-      "Password": "taskpass",
-      "SavePassword": true,
-      "SSLMode": "prefer"
-    },
-    "5": {
-      "Name": "Event Micro DB",
-      "Group": "Servers",
-      "Host": "event_postgres",
-      "Port": 5432,
-      "MaintenanceDB": "eventdb",
-      "Username": "eventuser",
-      "Password": "eventpass",
-      "SavePassword": true,
-      "SSLMode": "prefer"
-    },
-    "6": {
       "Name": "Hoppscotch DB",
       "Group": "Servers",
       "Host": "hoppscotch-db",

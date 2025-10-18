@@ -1,0 +1,70 @@
+{
+    "_id": "uuid-string-here",
+    "title": "Название задачи",
+    "description": "Описание задачи",
+    "status": "open",
+    "priority": 3,
+    "creator_id": "uuid-of-creator",
+    "due_date": ISODate("2025-10-30T00:00:00"),
+    "completed_at": null,
+    "created_at": ISODate("2025-10-18T12:00:00"),
+    "updated_at": ISODate("2025-10-18T12:00:00"),
+    "last_activity_at": ISODate("2025-10-18T12:00:00"),
+  
+    "assignees": [
+      {
+        "contact_id": "uuid-of-assignee1",
+        "added_at": ISODate("2025-10-18T12:00:00")
+      },
+      {
+        "contact_id": "uuid-of-assignee2",
+        "added_at": ISODate("2025-10-18T13:00:00")
+      }
+    ],
+  
+    "watchers": [
+      {
+        "contact_id": "uuid-of-watcher1",
+        "added_at": ISODate("2025-10-18T12:00:00")
+      }
+    ],
+  
+    "comments": [
+      {
+        "id": "uuid-of-comment1",
+        "author_id": "uuid-of-author",
+        "content": "Текст комментария",
+        "edited_at": null,
+        "created_at": ISODate("2025-10-18T12:05:00"),
+        "updated_at": ISODate("2025-10-18T12:05:00")
+      }
+    ],
+  
+    "attachments": [
+      {
+        "id": "uuid-of-attachment1",
+        "file_id": "uuid-of-file",
+        "uploaded_by": "uuid-of-uploader",
+        "uploaded_at": ISODate("2025-10-18T12:10:00")
+      }
+    ],
+  
+    "checklist_items": [
+      {
+        "id": "uuid-of-item1",
+        "title": "Подзадача 1",
+        "is_completed": false,
+        "completed_by": null,
+        "completed_at": null,
+        "created_at": ISODate("2025-10-18T12:00:00"),
+        "updated_at": ISODate("2025-10-18T12:00:00")
+      }
+    ],
+  
+    "reads": [
+      {
+        "contact_id": "uuid-of-viewer1",
+        "last_viewed_at": ISODate("2025-10-18T12:00:00")
+      }
+    ]
+  }

@@ -112,17 +112,23 @@ services:
       - oktarion_ngg
 
   # Mongo Express (web UI for MongoDB)
+  # Currently configured for Task Microservice MongoDB
+  # To add Message/Event MongoDB services in the future:
+  # 1. Add depends_on for new MongoDB services
+  # 2. Mongo Express will auto-discover all MongoDB instances in the oktarion_ngg network
   mongo-express:
     image: mongo-express:latest
     container_name: mongo-express
     restart: always
     environment:
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
-      - ME_CONFIG_MONGODB_SERVER=alternative-db
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=rootpass
+      - ME_CONFIG_MONGODB_SERVER=task_mongodb
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=taskuser
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=taskpass
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
+      - ME_CONFIG_MONGODB_URL=mongodb://taskuser:taskpass@task_mongodb:27017/taskdb?authSource=admin
     ports:
       - "8781:8081"
     networks:

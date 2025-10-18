@@ -6,7 +6,8 @@ data class AppConfig(
     val server: ServerConfig,
     val database: DatabaseConfig,
     val logging: LoggingConfig,
-    val security: SecurityConfig
+    val security: SecurityConfig,
+    val pagination: PaginationConfig
 )
 
 data class ServerConfig(
@@ -16,9 +17,8 @@ data class ServerConfig(
 )
 
 data class DatabaseConfig(
-    val url: String,
-    val user: String,
-    val password: String,
+    val connectionString: String,
+    val databaseName: String,
     val maxPoolSize: Int = 10
 )
 
@@ -35,6 +35,11 @@ data class SecurityConfig(
     val rateLimitWindowMinutes: Int = 1
 )
 
+data class PaginationConfig(
+    val defaultLimit: Int = 50,
+    val maxLimit: Int = 100
+)
+
 fun Application.getAppConfig(): AppConfig {
     return AppConfig(
         server = ServerConfig(
@@ -49,15 +54,12 @@ fun Application.getAppConfig(): AppConfig {
                 ?: "development"
         ),
         database = DatabaseConfig(
-            url = System.getenv("POSTGRES_URL") 
-                ?: environment.config.propertyOrNull("postgres.url")?.getString()
-                ?: "jdbc:postgresql://postgres:5432/contactdb",
-            user = System.getenv("POSTGRES_USER")
-                ?: environment.config.propertyOrNull("postgres.user")?.getString()
-                ?: "contactuser",
-            password = System.getenv("POSTGRES_PASSWORD")
-                ?: environment.config.propertyOrNull("postgres.password")?.getString()
-                ?: "contactpass",
+            connectionString = System.getenv("MONGODB_CONNECTION_STRING") 
+                ?: environment.config.propertyOrNull("mongodb.connectionString")?.getString()
+                ?: "mongodb://mongodb:27017",
+            databaseName = System.getenv("MONGODB_DATABASE")
+                ?: environment.config.propertyOrNull("mongodb.database")?.getString()
+                ?: "taskdb",
             maxPoolSize = System.getenv("DB_MAX_POOL_SIZE")?.toIntOrNull() 
                 ?: environment.config.propertyOrNull("db.maxPoolSize")?.getString()?.toIntOrNull() 
                 ?: 10
@@ -86,6 +88,14 @@ fun Application.getAppConfig(): AppConfig {
             rateLimitWindowMinutes = System.getenv("RATE_LIMIT_WINDOW_MINUTES")?.toIntOrNull() 
                 ?: environment.config.propertyOrNull("security.rateLimit.windowMinutes")?.getString()?.toIntOrNull() 
                 ?: 1
+        ),
+        pagination = PaginationConfig(
+            defaultLimit = System.getenv("PAGINATION_DEFAULT_LIMIT")?.toIntOrNull() 
+                ?: environment.config.propertyOrNull("pagination.defaultLimit")?.getString()?.toIntOrNull() 
+                ?: 50,
+            maxLimit = System.getenv("PAGINATION_MAX_LIMIT")?.toIntOrNull() 
+                ?: environment.config.propertyOrNull("pagination.maxLimit")?.getString()?.toIntOrNull() 
+                ?: 100
         )
     )
 }

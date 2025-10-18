@@ -1,16 +1,49 @@
 package com.task_micro.infrastructure
 
 import com.task_micro.config.getAppConfig
-import com.task_micro.controller.configureCitiesRouting
+import com.task_micro.controller.configureTaskCreateRouting
+import com.task_micro.controller.configureTaskReadRouting
+import com.task_micro.controller.configureTaskUpdateRouting
+import com.task_micro.controller.configureTaskDeleteRouting
+import com.task_micro.controller.assignee.configureAssigneeCreateRouting
+import com.task_micro.controller.assignee.configureAssigneeReadRouting
+import com.task_micro.controller.assignee.configureAssigneeDeleteRouting
+import com.task_micro.controller.watcher.configureWatcherCreateRouting
+import com.task_micro.controller.watcher.configureWatcherReadRouting
+import com.task_micro.controller.watcher.configureWatcherDeleteRouting
+import com.task_micro.controller.checklist.configureChecklistCreateRouting
+import com.task_micro.controller.checklist.configureChecklistReadRouting
+import com.task_micro.controller.checklist.configureChecklistUpdateRouting
+import com.task_micro.controller.checklist.configureChecklistDeleteRouting
 import io.ktor.server.application.*
-import java.sql.Connection
-import java.sql.DriverManager
+import org.litote.kmongo.coroutine.coroutine
+import org.litote.kmongo.reactivestreams.KMongo
 
 fun Application.configureDatabases() {
-    val dbConnection: Connection = connectToPostgres(embedded = false)
+    val mongoClient = connectToMongo()
+    val database = mongoClient.getDatabase(getAppConfig().database.databaseName)
     
-    // Configure cities routing with database connection
-    configureCitiesRouting(dbConnection)
+    // Configure task routing with database connection
+    configureTaskCreateRouting(database)
+    configureTaskReadRouting(database)
+    configureTaskUpdateRouting(database)
+    configureTaskDeleteRouting(database)
+    
+    // Configure assignee routing
+    configureAssigneeCreateRouting(database)
+    configureAssigneeReadRouting(database)
+    configureAssigneeDeleteRouting(database)
+    
+    // Configure watcher routing
+    configureWatcherCreateRouting(database)
+    configureWatcherReadRouting(database)
+    configureWatcherDeleteRouting(database)
+    
+    // Configure checklist routing
+    configureChecklistCreateRouting(database)
+    configureChecklistReadRouting(database)
+    configureChecklistUpdateRouting(database)
+    configureChecklistDeleteRouting(database)
     
     // Kafka configuration temporarily disabled
     // install(Kafka) {
@@ -49,35 +82,21 @@ fun Application.configureDatabases() {
     //     }
     // }
 }
+
 /**
- * Makes a connection to a Postgres database.
+ * Makes a connection to a MongoDB database.
  *
- * In order to connect to your running Postgres process,
+ * In order to connect to your running MongoDB process,
  * please specify the following parameters in your configuration file:
- * - postgres.url -- Url of your running database process.
- * - postgres.user -- Username for database connection
- * - postgres.password -- Password for database connection
+ * - mongodb.connectionString -- Connection string to your running MongoDB process.
+ * - mongodb.database -- Database name
  *
- * If you don't have a database process running yet, you may need to [download]((https://www.postgresql.org/download/))
- * and install Postgres and follow the instructions [here](https://postgresapp.com/).
- * Then, you would be able to edit your url,  which is usually "jdbc:postgresql://host:port/database", as well as
- * user and password values.
+ * If you don't have a database process running yet, you may need to [download](https://www.mongodb.com/try/download/community)
+ * and install MongoDB and follow the instructions [here](https://docs.mongodb.com/manual/installation/).
+ * Then, you would be able to edit your connection string, which is usually "mongodb://host:port", as well as
+ * database name.
  *
- *
- * @param embedded -- if [true] defaults to an embedded database for tests that runs locally in the same process.
- * In this case you don't have to provide any parameters in configuration file, and you don't have to run a process.
- *
- * @return [Connection] that represent connection to the database. Please, don't forget to close this connection when
- * your application shuts down by calling [Connection.close]
+ * @return [CoroutineClient] that represent connection to the database. Please, don't forget to close this connection when
+ * your application shuts down by calling [CoroutineClient.close]
  * */
-fun Application.connectToPostgres(embedded: Boolean): Connection {
-    Class.forName("org.postgresql.Driver")
-    if (embedded) {
-        log.info("Using embedded H2 database for testing; replace this flag to use postgres")
-        return DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "root", "")
-    } else {
-        val config = getAppConfig()
-        log.info("Connecting to postgres database at ${config.database.url}")
-        return DriverManager.getConnection(config.database.url, config.database.user, config.database.password)
-    }
-}
+fun Application.connectToMongo() = KMongo.createClient(getAppConfig().database.connectionString).coroutine

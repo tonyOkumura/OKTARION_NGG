@@ -38,7 +38,6 @@ fun Application.module() {
     // Configure business logic
     configureDatabases()
     configureHealthCheck()
-    configureRouting()
     
     // Configure frameworks
     configureFrameworks()

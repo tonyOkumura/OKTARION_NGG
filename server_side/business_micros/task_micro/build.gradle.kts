@@ -20,8 +20,8 @@ dependencies {
     implementation(libs.ktor.server.di)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.postgresql)
-    implementation(libs.h2)
+    implementation(libs.mongodb.driver)
+    implementation(libs.mongodb.coroutine)
     // implementation(libs.ktor.server.kafka)  // Temporarily disabled
     // implementation(libs.ktor.client.core)   // Temporarily disabled
     implementation(libs.ktor.server.call.logging)
