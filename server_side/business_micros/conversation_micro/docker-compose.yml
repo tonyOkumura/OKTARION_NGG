@@ -49,6 +49,10 @@ services:
       RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
       RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-100}
       RATE_LIMIT_WINDOW_MINUTES: ${RATE_LIMIT_WINDOW_MINUTES:-1}
+      
+      # Pagination configuration
+      PAGINATION_DEFAULT_LIMIT: ${PAGINATION_DEFAULT_LIMIT:-50}
+      PAGINATION_MAX_LIMIT: ${PAGINATION_MAX_LIMIT:-100}
     depends_on:
       postgres:
         condition: service_healthy

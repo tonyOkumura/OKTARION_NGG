@@ -6,7 +6,8 @@ data class AppConfig(
     val server: ServerConfig,
     val database: DatabaseConfig,
     val logging: LoggingConfig,
-    val security: SecurityConfig
+    val security: SecurityConfig,
+    val pagination: PaginationConfig
 )
 
 data class ServerConfig(
@@ -33,6 +34,11 @@ data class SecurityConfig(
     val enableRateLimit: Boolean = true,
     val rateLimitRequests: Int = 100,
     val rateLimitWindowMinutes: Int = 1
+)
+
+data class PaginationConfig(
+    val defaultLimit: Int = 50,
+    val maxLimit: Int = 100
 )
 
 fun Application.getAppConfig(): AppConfig {
@@ -86,6 +92,14 @@ fun Application.getAppConfig(): AppConfig {
             rateLimitWindowMinutes = System.getenv("RATE_LIMIT_WINDOW_MINUTES")?.toIntOrNull() 
                 ?: environment.config.propertyOrNull("security.rateLimit.windowMinutes")?.getString()?.toIntOrNull() 
                 ?: 1
+        ),
+        pagination = PaginationConfig(
+            defaultLimit = System.getenv("PAGINATION_DEFAULT_LIMIT")?.toIntOrNull() 
+                ?: environment.config.propertyOrNull("pagination.defaultLimit")?.getString()?.toIntOrNull() 
+                ?: 50,
+            maxLimit = System.getenv("PAGINATION_MAX_LIMIT")?.toIntOrNull() 
+                ?: environment.config.propertyOrNull("pagination.maxLimit")?.getString()?.toIntOrNull() 
+                ?: 100
         )
     )
 }

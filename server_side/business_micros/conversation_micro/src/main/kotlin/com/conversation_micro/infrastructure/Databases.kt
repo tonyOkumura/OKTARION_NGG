@@ -1,16 +1,21 @@
 package com.conversation_micro.infrastructure
 
 import com.conversation_micro.config.getAppConfig
-import com.conversation_micro.controller.configureCitiesRouting
+import com.conversation_micro.controller.configureConversationRouting
+import com.conversation_micro.controller.configureParticipantRouting
 import io.ktor.server.application.*
 import java.sql.Connection
 import java.sql.DriverManager
 
 fun Application.configureDatabases() {
     val dbConnection: Connection = connectToPostgres(embedded = false)
+    val config = getAppConfig()
     
-    // Configure cities routing with database connection
-    configureCitiesRouting(dbConnection)
+    // Configure conversation routing with database connection and pagination config
+    configureConversationRouting(dbConnection, config.pagination)
+    
+    // Configure participant routing with database connection
+    configureParticipantRouting(dbConnection)
     
     // Kafka configuration temporarily disabled
     // install(Kafka) {

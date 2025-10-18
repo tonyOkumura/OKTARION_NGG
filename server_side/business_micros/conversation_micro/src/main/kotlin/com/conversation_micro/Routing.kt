@@ -7,10 +7,7 @@ import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
     routing {
-        get("/") {
-            call.respondText("Hello World!")
-        }
-        
+
         // Обработка CORS preflight запросов
         options {
             call.respond(HttpStatusCode.OK)

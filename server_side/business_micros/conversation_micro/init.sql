@@ -1,22 +1,27 @@
--- Создание таблицы cities
-CREATE TABLE IF NOT EXISTS cities (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    country VARCHAR(255) NOT NULL,
-    population INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(100),
+    is_group_chat BOOLEAN NOT NULL DEFAULT FALSE,
+    owner_id UUID ,
+    avatar_file_id UUID,
+    category VARCHAR(50),
+    last_message_id UUID,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Создание индексов
-CREATE INDEX IF NOT EXISTS idx_cities_name ON cities(name);
-CREATE INDEX IF NOT EXISTS idx_cities_country ON cities(country);
+CREATE TABLE IF NOT EXISTS conversation_participants (
+    conversation_id UUID NOT NULL,
+    contact_id UUID NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'member',
+    joined_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    invited_by UUID,
+    invited_at TIMESTAMP,
+    alias VARCHAR(100),
+    unread_count INTEGER NOT NULL DEFAULT 0,
+    last_read_at TIMESTAMP,
+    last_message_read_id UUID,
+    PRIMARY KEY (conversation_id, contact_id)
+);
 
--- Вставка тестовых данных
-INSERT INTO cities (name, country, population) VALUES 
-('Moscow', 'Russia', 12615000),
-('Saint Petersburg', 'Russia', 5383000),
-('Novosibirsk', 'Russia', 1625000),
-('Yekaterinburg', 'Russia', 1495000),
-('Kazan', 'Russia', 1257000)
-ON CONFLICT DO NOTHING;
+ALTER TABLE conversation_participants ADD FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE;
