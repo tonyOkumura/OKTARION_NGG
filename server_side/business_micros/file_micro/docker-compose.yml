@@ -1,0 +1,82 @@
+services:
+  # MinIO объектное хранилище
+  minio:
+    image: minio/minio:latest
+    container_name: file_minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      # MINIO_SERVER_URL: http://localhost:9300
+      # MINIO_BROWSER_REDIRECT_URL: http://localhost:9301
+      # MINIO_API_SELECT_PARQUET: on
+    ports:
+      - "9300:9000"  # API порт
+      - "9301:9001"  # Console порт
+    volumes:
+      - minio_data:/data
+    networks:
+      - oktarion_files_net
+      - oktarion_ngg
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Микросервис файлов на Ktor
+  file-service:
+    build: .
+    container_name: file_microservice
+    ports:
+      - "${SERVER_PORT:-8060}:${SERVER_PORT:-8060}"
+    environment:
+      # MinIO configuration
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://minio:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME:-files}
+      MINIO_REGION: ${MINIO_REGION:-us-east-1}
+      MINIO_EXTERNAL_URL: ${MINIO_EXTERNAL_URL:-http://localhost:9300}
+      
+      # Server configuration
+      SERVER_PORT: ${SERVER_PORT:-8060}
+      SERVER_HOST: ${SERVER_HOST:-0.0.0.0}
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      
+      # Logging configuration
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      LOG_CORRELATION_ID: ${LOG_CORRELATION_ID:-true}
+      
+      # Security configuration
+      CORS_ENABLED: ${CORS_ENABLED:-true}
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-100}
+      RATE_LIMIT_WINDOW_MINUTES: ${RATE_LIMIT_WINDOW_MINUTES:-1}
+      
+      # Pagination configuration
+      PAGINATION_DEFAULT_LIMIT: ${PAGINATION_DEFAULT_LIMIT:-50}
+      PAGINATION_MAX_LIMIT: ${PAGINATION_MAX_LIMIT:-100}
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - oktarion_files_net
+      - oktarion_ngg
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${SERVER_PORT:-8060}/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  minio_data:
+
+networks:
+  oktarion_files_net:
+    driver: bridge
+  oktarion_ngg:
+    external: true
