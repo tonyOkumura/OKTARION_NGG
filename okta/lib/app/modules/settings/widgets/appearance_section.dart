@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/core.dart';
+import '../../../../shared/widgets/widgets.dart';
 import '../controllers/settings_controller.dart';
 
 class AppearanceSection extends StatelessWidget {
@@ -14,30 +15,13 @@ class AppearanceSection extends StatelessWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cs.surface.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.15)),
-      ),
+    return HomeCard(
+      title: 'Внешний вид',
+      icon: Icons.palette_outlined,
+      height: 250,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.palette_outlined, color: cs.primary, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                'Внешний вид',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Text(
             'Цветовая схема',
             style: theme.textTheme.titleSmall?.copyWith(

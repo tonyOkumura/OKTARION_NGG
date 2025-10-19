@@ -13,6 +13,9 @@ class GlassSearchBar extends StatelessWidget {
     this.onFilterPressed,
     this.onSortPressed,
     this.onAddPressed,
+    this.addButtonLink,
+    this.filterButtonLink,
+    this.sortButtonLink,
     this.viewModes = const [],
     this.currentViewMode = 0,
     this.onViewModeChanged,
@@ -20,13 +23,18 @@ class GlassSearchBar extends StatelessWidget {
     this.showFilterButton = true,
     this.showSortButton = true,
     this.showAddButton = false,
+    this.isFilterActive = false,
+    this.isSortActive = false,
   });
 
   final TextEditingController searchController;
   final ValueChanged<String>? onSearchChanged;
-  final VoidCallback? onFilterPressed;
-  final VoidCallback? onSortPressed;
-  final VoidCallback? onAddPressed;
+  final ValueChanged<BuildContext>? onFilterPressed;
+  final ValueChanged<BuildContext>? onSortPressed;
+  final ValueChanged<BuildContext>? onAddPressed;
+  final LayerLink? addButtonLink;
+  final LayerLink? filterButtonLink;
+  final LayerLink? sortButtonLink;
   final List<ViewMode> viewModes;
   final int currentViewMode;
   final ValueChanged<int>? onViewModeChanged;
@@ -34,6 +42,8 @@ class GlassSearchBar extends StatelessWidget {
   final bool showFilterButton;
   final bool showSortButton;
   final bool showAddButton;
+  final bool isFilterActive;
+  final bool isSortActive;
 
   @override
   Widget build(BuildContext context) {
@@ -55,15 +65,20 @@ class GlassSearchBar extends StatelessWidget {
             children: [
               // Кнопка добавления (самая первая)
               if (showAddButton) ...[
-                GlassButton(
-                  onPressed: onAddPressed,
-                  padding: const EdgeInsets.all(8),
-                  backgroundColor: cs.surface.withValues(alpha: 0.7),
-                  borderColor: AppTheme.values[3].primaryColor.withValues(alpha: 0.3),
-                  child: Icon(
-                    Icons.add_outlined,
-                    size: 20,
-                    color: AppTheme.values[3].primaryColor,
+                CompositedTransformTarget(
+                  link: addButtonLink ?? LayerLink(),
+                  child: Builder(
+                    builder: (buttonContext) => GlassButton(
+                      onPressed: () => onAddPressed?.call(buttonContext),
+                      padding: const EdgeInsets.all(8),
+                      backgroundColor: cs.surface.withValues(alpha: 0.7),
+                      borderColor: AppTheme.values[3].primaryColor.withValues(alpha: 0.3),
+                      child: Icon(
+                        Icons.add_outlined,
+                        size: 20,
+                        color: AppTheme.values[3].primaryColor,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -71,25 +86,47 @@ class GlassSearchBar extends StatelessWidget {
               
               // Кнопки фильтра и сортировки (primary цвета)
               if (showFilterButton) ...[
-                GlassButton(
-                  onPressed: onFilterPressed,
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    Icons.filter_list_outlined,
-                    size: 20,
-                    color: cs.onSurfaceVariant,
+                CompositedTransformTarget(
+                  link: filterButtonLink ?? LayerLink(),
+                  child: Builder(
+                    builder: (filterContext) => GlassButton(
+                      onPressed: () => onFilterPressed?.call(filterContext),
+                      padding: const EdgeInsets.all(8),
+                      backgroundColor: isFilterActive 
+                          ? cs.primary.withValues(alpha: 0.1)
+                          : cs.surface.withValues(alpha: 0.7),
+                      borderColor: isFilterActive 
+                          ? cs.primary.withValues(alpha: 0.3)
+                          : null,
+                      child: Icon(
+                        Icons.filter_list_outlined,
+                        size: 20,
+                        color: isFilterActive ? cs.primary : cs.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
               ],
               if (showSortButton) ...[
-                GlassButton(
-                  onPressed: onSortPressed,
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    Icons.sort_outlined,
-                    size: 20,
-                    color: cs.onSurfaceVariant,
+                CompositedTransformTarget(
+                  link: sortButtonLink ?? LayerLink(),
+                  child: Builder(
+                    builder: (sortContext) => GlassButton(
+                      onPressed: () => onSortPressed?.call(sortContext),
+                      padding: const EdgeInsets.all(8),
+                      backgroundColor: isSortActive 
+                          ? cs.primary.withValues(alpha: 0.1)
+                          : cs.surface.withValues(alpha: 0.7),
+                      borderColor: isSortActive 
+                          ? cs.primary.withValues(alpha: 0.3)
+                          : null,
+                      child: Icon(
+                        Icons.sort_outlined,
+                        size: 20,
+                        color: isSortActive ? cs.primary : cs.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),

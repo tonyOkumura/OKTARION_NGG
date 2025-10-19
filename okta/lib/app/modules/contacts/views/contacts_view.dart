@@ -18,12 +18,15 @@ class ContactsView extends GetView<ContactsController> {
         Obx(() => GlassSearchBar(
           searchController: controller.searchController,
           onSearchChanged: controller.onSearchChanged,
-          onFilterPressed: controller.onFilterPressed,
-          onSortPressed: controller.onSortPressed,
+          onFilterPressed: (context) => controller.onFilterPressed(context),
+          onSortPressed: (context) => controller.onSortPressed(context),
+          filterButtonLink: controller.filterButtonLink,
+          sortButtonLink: controller.sortButtonLink,
           viewModes: controller.viewModes,
           currentViewMode: controller.currentViewMode.value,
           onViewModeChanged: controller.onViewModeChanged,
-          hintText: 'Поиск контактов...',
+          isFilterActive: controller.hasActiveFilters,
+          isSortActive: controller.hasActiveSort,
         )),
         
         const SizedBox(height: 16),

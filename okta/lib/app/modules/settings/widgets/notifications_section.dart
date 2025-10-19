@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../shared/widgets/widgets.dart';
 import '../controllers/settings_controller.dart';
 
 class NotificationsSection extends StatelessWidget {
@@ -13,30 +14,13 @@ class NotificationsSection extends StatelessWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cs.surface.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withOpacity(0.15)),
-      ),
+    return HomeCard(
+      title: 'Уведомления',
+      icon: Icons.notifications_outlined,
+      height: 250,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.notifications_outlined, color: cs.secondary, size: 24),
-              const SizedBox(width: 8),
-              Text(
-                'Уведомления',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: cs.onSurface,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Obx(() => SwitchListTile(
             title: Text(
               'Включить уведомления',

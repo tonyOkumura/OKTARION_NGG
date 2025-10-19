@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'glass_card.dart';
-
 class HomeCard extends StatefulWidget {
   const HomeCard({
     super.key,
@@ -13,6 +11,7 @@ class HomeCard extends StatefulWidget {
     this.itemsPerPage = 10,
     this.childBuilder,
     this.height = 300,
+    this.icon,
   });
 
   final String title;
@@ -22,6 +21,7 @@ class HomeCard extends StatefulWidget {
   final int itemsPerPage;
   final Widget Function(int currentPage, int itemsPerPage)? childBuilder;
   final double height;
+  final IconData? icon;
 
   @override
   State<HomeCard> createState() => _HomeCardState();
@@ -84,74 +84,89 @@ class _HomeCardState extends State<HomeCard> {
     required String? pageInfo,
     required Widget child,
   }) {
-    return GlassCard(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 64,
-              child: Row(
-                children: [
-                  if (showPagination)
-                    IconButton(
-                      onPressed: currentPage > 0
-                          ? () {
-                              setState(() {
-                                _currentPage--;
-                              });
-                            }
-                          : null,
-                      icon: const Icon(Icons.chevron_left),
-                      iconSize: 20,
-                      tooltip: 'Предыдущая страница',
-                    ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          widget.title,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        if (showPagination && pageInfo != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Text(
-                              pageInfo,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: cs.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+    return Container(
+      height: widget.height + 100, // Добавляем высоту для заголовка и пагинации
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cs.surface.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: cs.outline.withOpacity(0.15)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Заголовок с иконкой
+          Row(
+            children: [
+              if (widget.icon != null) ...[
+                Icon(
+                  widget.icon,
+                  color: cs.primary,
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+              ],
+              Expanded(
+                child: Text(
+                  widget.title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: cs.onSurface,
                   ),
-                  if (showPagination)
-                    IconButton(
-                      onPressed: currentPage < totalPages - 1
-                          ? () {
-                              setState(() {
-                                _currentPage++;
-                              });
-                            }
-                          : null,
-                      icon: const Icon(Icons.chevron_right),
-                      iconSize: 20,
-                      tooltip: 'Следующая страница',
-                    ),
-                ],
+                ),
               ),
-            ),
+            ],
+          ),
+          
+          // Пагинация (если нужна)
+          if (showPagination) ...[
             const SizedBox(height: 12),
-            SizedBox(height: widget.height, child: child),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: currentPage > 0
+                      ? () {
+                          setState(() {
+                            _currentPage--;
+                          });
+                        }
+                      : null,
+                  icon: const Icon(Icons.chevron_left),
+                  iconSize: 20,
+                  tooltip: 'Предыдущая страница',
+                ),
+                Expanded(
+                  child: Text(
+                    pageInfo ?? '',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                IconButton(
+                  onPressed: currentPage < totalPages - 1
+                      ? () {
+                          setState(() {
+                            _currentPage++;
+                          });
+                        }
+                      : null,
+                  icon: const Icon(Icons.chevron_right),
+                  iconSize: 20,
+                  tooltip: 'Следующая страница',
+                ),
+              ],
+            ),
           ],
-        ),
+          
+          const SizedBox(height: 16),
+          
+          // Основной контент
+          Expanded(
+            child: child,
+          ),
+        ],
       ),
     );
   }

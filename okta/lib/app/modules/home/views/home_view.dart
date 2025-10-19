@@ -103,6 +103,7 @@ class HomeCardProfile extends StatelessWidget {
     
     return HomeCard(
       title: 'Профиль',
+      icon: Icons.person_outline,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -239,6 +240,7 @@ class HomeCardWelcome extends StatelessWidget {
     
     return HomeCard(
       title: 'Добро пожаловать',
+      icon: Icons.home_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -307,6 +309,7 @@ class HomeCardTasksOverview extends StatelessWidget {
     
     return HomeCard(
       title: 'Задачи',
+      icon: Icons.task_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -459,6 +462,7 @@ class HomeCardMessagesPreview extends StatelessWidget {
     
     return HomeCard(
       title: 'Сообщения',
+      icon: Icons.message_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -509,7 +513,7 @@ class HomeCardMessagesPreview extends StatelessWidget {
                 Icon(Icons.mark_email_unread, color: cs.tertiary, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
+        child: Text(
                     '7 непрочитанных сообщений',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: cs.onTertiaryContainer,
@@ -618,6 +622,7 @@ class HomeCardCalendar extends StatelessWidget {
     
     return HomeCard(
       title: 'События',
+      icon: Icons.event_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -759,6 +764,7 @@ class HomeCardNotifications extends StatelessWidget {
     
     return HomeCard(
       title: 'Уведомления',
+      icon: Icons.notifications_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

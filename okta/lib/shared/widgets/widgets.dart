@@ -16,6 +16,7 @@ export 'glass_header_mode_toggle.dart';
 export 'glass_loading.dart';
 export 'glass_notification.dart';
 export 'glass_page_header.dart';
+export 'glass_popover.dart';
 export 'glass_search_bar.dart';
 export 'glass_version_card.dart';
 export 'home_card.dart';
