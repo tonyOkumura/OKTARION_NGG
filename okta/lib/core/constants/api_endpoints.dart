@@ -30,4 +30,11 @@ class ApiEndpoints {
   static const String version = '/version';
   static const String uploadFile = '/upload';
   static const String downloadFile = '/download';
+
+  // ==================== MODULE ENDPOINTS ====================
+  static const String messages = '/messages';
+  static const String tasks = '/tasks';
+  static const String events = '/events';
+  static const String files = '/files';
+  static const String contacts = '/contacts';
 }

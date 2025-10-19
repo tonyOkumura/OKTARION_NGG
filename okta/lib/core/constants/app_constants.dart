@@ -9,11 +9,8 @@ class AppConstants {
   static const String appDescription = 'A new Flutter project';
 
   // ==================== API CONSTANTS ====================
-  static const String baseUrl = 'http://localhost:8008';
+  // API настройки перенесены в lib/core/config/api_config.dart
   static const String apiVersion = 'v1';
-  static const Duration apiTimeout = Duration(seconds: 30);
-  static const Duration connectTimeout = Duration(seconds: 15);
-  static const Duration receiveTimeout = Duration(seconds: 15);
 
   // ==================== SUPABASE CONSTANTS ====================
   static const String supabaseUrl = 'http://localhost:8008';

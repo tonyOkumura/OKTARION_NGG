@@ -7,6 +7,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'app.dart';
 import 'core/core.dart';
 import 'core/services/theme_service.dart';
+import 'core/initializers/api_initializer.dart';
 
 void main() async {
   // Запуск приложения с обработкой ошибок
@@ -46,6 +47,11 @@ void main() async {
       } else {
         LogService.w('⚠️ Supabase connection check failed, but continuing...');
       }
+      
+      // Инициализация API сервисов
+      LogService.i('🌐 Initializing API services...');
+      await ApiInitializer.initialize();
+      LogService.i('✅ API services initialized successfully');
       
       // Запуск приложения
       LogService.i('🎯 Launching OktarionApp...');
