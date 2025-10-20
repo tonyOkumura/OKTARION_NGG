@@ -1,25 +1,29 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 import '../../../../shared/widgets/widgets.dart';
+import '../../../../core/core.dart';
 
 class ContactsController extends GetxController {
+  // Репозиторий для работы с контактами
+  final ContactsRepository _contactsRepository = Get.find<ContactsRepository>();
+  
   // Поиск
   final searchController = TextEditingController();
+  Timer? _searchDebounceTimer;
   
-  // Режимы представления
+  // Состояние загрузки
+  final isLoading = false.obs;
+  final contacts = <Contact>[].obs;
+  final hasMore = false.obs;
+  final nextCursor = Rxn<String>();
+  
+  // Режимы представления - только список
   final currentViewMode = 0.obs;
   final viewModes = const <ViewMode>[
     ViewMode(
       tooltip: 'Список',
       icon: Icons.view_list,
-    ),
-    ViewMode(
-      tooltip: 'Сетка',
-      icon: Icons.grid_view,
-    ),
-    ViewMode(
-      tooltip: 'Организационная схема',
-      icon: Icons.account_tree_outlined,
     ),
   ];
 
@@ -30,11 +34,12 @@ class ContactsController extends GetxController {
   final RxBool filterByDepartment = false.obs;
   
   // Сортировка
-  final RxString sortBy = 'name'.obs;
+  final RxString sortBy = 'username'.obs;
+  final RxString sortOrder = 'ASC'.obs;
 
   // Геттеры для активных состояний
   bool get hasActiveFilters => filterEmployees.value || filterWithAvatars.value || filterActive.value || filterByDepartment.value;
-  bool get hasActiveSort => sortBy.value != 'name';
+  bool get hasActiveSort => sortBy.value != 'username' || sortOrder.value != 'ASC';
 
   // Сброс фильтров
   void resetFilters() {
@@ -46,12 +51,77 @@ class ContactsController extends GetxController {
 
   // Сброс сортировки
   void resetSort() {
-    sortBy.value = 'name';
+    sortBy.value = 'username';
+    sortOrder.value = 'ASC';
   }
 
   @override
   void onInit() {
     super.onInit();
+    loadContacts();
+  }
+
+  // Загрузить контакты
+  Future<void> loadContacts({bool refresh = false}) async {
+    if (isLoading.value) return;
+    
+    try {
+      isLoading.value = true;
+      
+      if (refresh) {
+        contacts.clear();
+        nextCursor.value = null;
+      }
+      
+      final response = await _contactsRepository.getContacts(
+        search: searchController.text.isNotEmpty ? searchController.text : null,
+        cursor: nextCursor.value,
+        limit: 20,
+        sortBy: sortBy.value,
+        sortOrder: sortOrder.value,
+      );
+      
+      if (response.success && response.data != null) {
+        final contactsResponse = response.data!;
+        
+        LogService.d('Server response: hasMore=${contactsResponse.hasMore}, nextCursor=${contactsResponse.nextCursor}, totalCount=${contactsResponse.totalCount}');
+        LogService.d('Received ${contactsResponse.contacts.length} contacts from server');
+        
+        if (refresh) {
+          contacts.value = contactsResponse.contacts;
+          LogService.d('Refreshed contacts list, new length: ${contacts.length}');
+        } else {
+          contacts.addAll(contactsResponse.contacts);
+          LogService.d('Added contacts to list, new length: ${contacts.length}');
+        }
+        
+        hasMore.value = contactsResponse.hasMore && contactsResponse.nextCursor != null;
+        nextCursor.value = contactsResponse.nextCursor;
+        
+        LogService.i('Loaded ${contactsResponse.contacts.length} contacts, hasMore: ${hasMore.value}, nextCursor: ${nextCursor.value}');
+      } else {
+        LogService.e('Failed to load contacts: ${response.message}');
+      }
+    } catch (e) {
+      LogService.e('Error loading contacts: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Обновить контакты
+  Future<void> refreshContacts() async {
+    await loadContacts(refresh: true);
+  }
+
+  // Загрузить больше контактов (пагинация)
+  Future<void> loadMoreContacts() async {
+    // Если сервер сказал что больше нет контактов, не пытаемся загружать
+    if (!hasMore.value || isLoading.value) {
+      return;
+    }
+    
+    await loadContacts(refresh: false);
   }
 
   // Popover
@@ -62,13 +132,17 @@ class ContactsController extends GetxController {
   @override
   void onClose() {
     searchController.dispose();
+    _searchDebounceTimer?.cancel();
     _closePopover();
     super.onClose();
   }
 
-  // Обработка поиска
+  // Обработка поиска с debounce
   void onSearchChanged(String value) {
-    // Обработка поиска
+    _searchDebounceTimer?.cancel();
+    _searchDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+      refreshContacts();
+    });
   }
 
   // Открыть фильтры
@@ -119,6 +193,7 @@ class ContactsController extends GetxController {
               child: ElevatedButton(
                 onPressed: () {
                   // Применить фильтры
+                  refreshContacts();
                   _closePopover();
                 },
                 child: const Text('Применить'),
@@ -153,22 +228,41 @@ class ContactsController extends GetxController {
         child: Obx(() => Column(
           children: [
             RadioListTile<String>(
-              title: const Text('По имени'),
-              value: 'name',
+              title: const Text('По username'),
+              value: 'username',
               groupValue: sortBy.value,
-              onChanged: (value) => sortBy.value = value ?? 'name',
+              onChanged: (value) => sortBy.value = value ?? 'username',
+            ),
+            RadioListTile<String>(
+              title: const Text('По имени'),
+              value: 'firstName',
+              groupValue: sortBy.value,
+              onChanged: (value) => sortBy.value = value ?? 'username',
             ),
             RadioListTile<String>(
               title: const Text('По должности'),
               value: 'position',
               groupValue: sortBy.value,
-              onChanged: (value) => sortBy.value = value ?? 'name',
+              onChanged: (value) => sortBy.value = value ?? 'username',
             ),
             RadioListTile<String>(
               title: const Text('По отделу'),
               value: 'department',
               groupValue: sortBy.value,
-              onChanged: (value) => sortBy.value = value ?? 'name',
+              onChanged: (value) => sortBy.value = value ?? 'username',
+            ),
+            const Divider(),
+            RadioListTile<String>(
+              title: const Text('По возрастанию'),
+              value: 'ASC',
+              groupValue: sortOrder.value,
+              onChanged: (value) => sortOrder.value = value ?? 'ASC',
+            ),
+            RadioListTile<String>(
+              title: const Text('По убыванию'),
+              value: 'DESC',
+              groupValue: sortOrder.value,
+              onChanged: (value) => sortOrder.value = value ?? 'ASC',
             ),
             const SizedBox(height: 16),
             SizedBox(
@@ -176,6 +270,7 @@ class ContactsController extends GetxController {
               child: ElevatedButton(
                 onPressed: () {
                   // Применить сортировку
+                  refreshContacts();
                   _closePopover();
                 },
                 child: const Text('Применить'),

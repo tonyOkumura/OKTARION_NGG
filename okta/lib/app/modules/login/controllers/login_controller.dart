@@ -27,10 +27,16 @@ class LoginController extends GetxController {
   // Свойство для проверки готовности формы
   final isFormValid = false.obs;
 
+  // Сервис для создания контакта после регистрации
+  late final UserPostRegistrationService _userPostRegistrationService;
+
   @override
   void onInit() {
     super.onInit();
     LogService.i('🔐 LoginController initialized');
+    
+    // Инициализируем сервис для создания контакта после регистрации
+    _userPostRegistrationService = Get.find<UserPostRegistrationService>();
     
     // Обновляем время каждую секунду
     _startTimer();
@@ -217,6 +223,9 @@ class LoginController extends GetxController {
       if (response.user != null) {
         LogService.i('✅ Successfully signed up: ${response.user!.email}');
         
+        // Создаем контакт пользователя после успешной регистрации
+        await _createUserContactAfterRegistration();
+        
         NotificationService.instance.showSuccess(
           title: 'Регистрация успешна!',
           message: response.session != null 
@@ -277,6 +286,22 @@ class LoginController extends GetxController {
       signUp();
     } else {
       signIn();
+    }
+  }
+
+  /// Создать контакт пользователя после успешной регистрации
+  Future<void> _createUserContactAfterRegistration() async {
+    try {
+      // Ждем немного, чтобы сессия успела обновиться
+      await Future.delayed(const Duration(milliseconds: 500));
+      
+      // Создаем контакт пользователя
+      await _userPostRegistrationService.handlePostRegistrationContactCreation();
+      
+      LogService.i('✅ Post-registration contact creation completed');
+    } catch (e) {
+      LogService.e('❌ Error in post-registration contact creation: $e');
+      // Не показываем ошибку пользователю, так как регистрация уже прошла успешно
     }
   }
 

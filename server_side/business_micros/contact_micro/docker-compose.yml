@@ -53,6 +53,9 @@ services:
       # Pagination configuration
       PAGINATION_DEFAULT_LIMIT: ${PAGINATION_DEFAULT_LIMIT:-50}
       PAGINATION_MAX_LIMIT: ${PAGINATION_MAX_LIMIT:-100}
+      
+      # Avatar service configuration
+      AVATAR_SERVICE_URL: ${AVATAR_SERVICE_URL:-http://localhost:8060}
     depends_on:
       postgres:
         condition: service_healthy

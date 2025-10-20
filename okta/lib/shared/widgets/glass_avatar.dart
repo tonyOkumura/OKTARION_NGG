@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:characters/characters.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:async';
 import '../../core/core.dart';
 import '../../core/enums/app_enums.dart';
 import 'glass_loading.dart';
 
-class GlassAvatar extends StatelessWidget {
+class GlassAvatar extends StatefulWidget {
   const GlassAvatar({
     super.key,
     required this.label,
@@ -24,6 +26,14 @@ class GlassAvatar extends StatelessWidget {
   final Color? textColor;
   final double borderWidth;
   final Color? borderColor;
+
+  @override
+  State<GlassAvatar> createState() => _GlassAvatarState();
+}
+
+class _GlassAvatarState extends State<GlassAvatar> {
+  Timer? _timeoutTimer;
+  bool _hasTimedOut = false;
 
   static int _accentIndexForLabel(String label) {
     if (label.isEmpty) return 0;
@@ -50,13 +60,49 @@ class GlassAvatar extends StatelessWidget {
     return (first + second).toUpperCase();
   }
 
+  /// Получить токен авторизации для запросов изображений
+  Map<String, String>? _getAuthHeaders() {
+    try {
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session?.accessToken != null) {
+        return {
+          'Authorization': 'Bearer ${session!.accessToken}',
+        };
+      }
+    } catch (e) {
+      // Игнорируем ошибки получения токена
+    }
+    return null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Устанавливаем таймаут в 2 секунды
+    if (widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty) {
+      _timeoutTimer = Timer(const Duration(seconds: 2), () {
+        if (mounted) {
+          setState(() {
+            _hasTimedOut = true;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timeoutTimer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final String initials = _computeInitials(label);
-    final double diameter = radius * 2;
-    final int idx = _accentIndexForLabel(label);
-    final Color baseColor = textColor ?? AppTheme.values[idx].primaryColor;
-    final Color bgColor = backgroundColor ?? baseColor.withOpacity(0.25);
+    final String initials = _computeInitials(widget.label);
+    final double diameter = widget.radius * 2;
+    final int idx = _accentIndexForLabel(widget.label);
+    final Color baseColor = widget.textColor ?? AppTheme.values[idx].primaryColor;
+    final Color bgColor = widget.backgroundColor ?? baseColor.withOpacity(0.25);
 
     return SizedBox(
       width: diameter,
@@ -67,52 +113,63 @@ class GlassAvatar extends StatelessWidget {
           ClipOval(
             child: Container(
               color: bgColor,
-              decoration: borderWidth > 0
+              decoration: widget.borderWidth > 0
                   ? BoxDecoration(
                       border: Border.all(
-                        color: borderColor ?? baseColor,
-                        width: borderWidth,
+                        color: widget.borderColor ?? baseColor,
+                        width: widget.borderWidth,
                       ),
                     )
                   : null,
             ),
           ),
-          if (avatarUrl != null && avatarUrl!.isNotEmpty)
+          if (widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty && !_hasTimedOut)
             ClipOval(
               child: CachedNetworkImage(
-                imageUrl: avatarUrl!,
+                imageUrl: widget.avatarUrl!,
+                httpHeaders: _getAuthHeaders(),
                 fit: BoxFit.cover,
                 width: diameter,
                 height: diameter,
                 filterQuality: FilterQuality.medium,
+                // Таймаут для загрузки изображения
+                fadeInDuration: const Duration(milliseconds: 200),
+                fadeOutDuration: const Duration(milliseconds: 100),
                 placeholder: (context, url) => Center(
-                  child: GlassLoading(size: radius * 1.25, color: baseColor),
+                  child: GlassLoading(size: widget.radius * 1.25, color: baseColor),
                 ),
-                errorWidget: (context, url, error) => Center(
-                  child: Text(
-                    initials,
-                    style: TextStyle(
-                      color: textColor ?? baseColor,
-                      fontWeight: FontWeight.w700,
-                      fontSize: (radius * 0.85).clamp(10.0, 18.0),
+                errorWidget: (context, url, error) {
+                  // Логируем ошибку для отладки
+                  debugPrint('GlassAvatar: Failed to load image $url - $error');
+                  return Center(
+                    child: Text(
+                      initials,
+                      style: TextStyle(
+                        color: widget.textColor ?? baseColor,
+                        fontWeight: FontWeight.w700,
+                        fontSize: (widget.radius * 0.85).clamp(10.0, 18.0),
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
                 // Настройки кэширования
                 memCacheWidth: diameter.toInt(),
                 memCacheHeight: diameter.toInt(),
                 maxWidthDiskCache: diameter.toInt(),
                 maxHeightDiskCache: diameter.toInt(),
+                // Настройки для предотвращения бесконечной загрузки
+                cacheKey: 'avatar_${widget.avatarUrl!.hashCode}',
+                useOldImageOnUrlChange: false,
               ),
             ),
-          if (avatarUrl == null || avatarUrl!.isEmpty)
+          if (widget.avatarUrl == null || widget.avatarUrl!.isEmpty || _hasTimedOut)
             Center(
               child: Text(
                 initials,
                 style: TextStyle(
-                  color: textColor ?? baseColor,
+                  color: widget.textColor ?? baseColor,
                   fontWeight: FontWeight.w700,
-                  fontSize: (radius * 0.85).clamp(10.0, 18.0),
+                  fontSize: (widget.radius * 0.85).clamp(10.0, 18.0),
                 ),
               ),
             ),

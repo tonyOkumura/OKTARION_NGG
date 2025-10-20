@@ -7,7 +7,8 @@ data class AppConfig(
     val database: DatabaseConfig,
     val logging: LoggingConfig,
     val security: SecurityConfig,
-    val pagination: PaginationConfig
+    val pagination: PaginationConfig,
+    val avatar: AvatarConfig
 )
 
 data class ServerConfig(
@@ -39,6 +40,10 @@ data class SecurityConfig(
 data class PaginationConfig(
     val defaultLimit: Int = 50,
     val maxLimit: Int = 100
+)
+
+data class AvatarConfig(
+    val serviceUrl: String = "http://localhost:8060"
 )
 
 fun Application.getAppConfig(): AppConfig {
@@ -100,6 +105,11 @@ fun Application.getAppConfig(): AppConfig {
             maxLimit = System.getenv("PAGINATION_MAX_LIMIT")?.toIntOrNull() 
                 ?: environment.config.propertyOrNull("pagination.maxLimit")?.getString()?.toIntOrNull() 
                 ?: 100
+        ),
+        avatar = AvatarConfig(
+            serviceUrl = System.getenv("AVATAR_SERVICE_URL") 
+                ?: environment.config.propertyOrNull("avatar.serviceUrl")?.getString() 
+                ?: "http://localhost:8060"
         )
     )
 }

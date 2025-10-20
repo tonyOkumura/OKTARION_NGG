@@ -10,8 +10,8 @@ fun Application.configureDatabases() {
     val config = getAppConfig()
     val dbConnection: Connection = connectToPostgres(embedded = false)
     
-    // Configure contacts routing with database connection and pagination config
-    configureContactRouting(dbConnection, config.pagination)
+    // Configure contacts routing with database connection, pagination config and avatar config
+    configureContactRouting(dbConnection, config.pagination, config.avatar)
     
     // Kafka configuration temporarily disabled
     // install(Kafka) {

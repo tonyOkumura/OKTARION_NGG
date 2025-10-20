@@ -17,15 +17,27 @@ class ApiResponse<T> {
     Map<String, dynamic> json,
     T Function(dynamic)? fromJsonT,
   ) {
-    return ApiResponse<T>(
-      success: json['success'] ?? false,
-      data: json['data'] != null && fromJsonT != null 
-          ? fromJsonT(json['data']) 
-          : json['data'],
-      message: json['message'],
-      statusCode: json['status_code'],
-      errors: json['errors'],
-    );
+    // Если ответ содержит поля success/data - это обернутый ответ
+    if (json.containsKey('success')) {
+      return ApiResponse<T>(
+        success: json['success'] ?? false,
+        data: json['data'] != null && fromJsonT != null 
+            ? fromJsonT(json['data']) 
+            : json['data'],
+        message: json['message'],
+        statusCode: json['status_code'],
+        errors: json['errors'],
+      );
+    } else {
+      // Если ответ не содержит success - это прямой ответ сервера
+      return ApiResponse<T>(
+        success: true, // Считаем успешным, если сервер ответил
+        data: fromJsonT != null ? fromJsonT(json) : json as T,
+        message: null,
+        statusCode: null,
+        errors: null,
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {

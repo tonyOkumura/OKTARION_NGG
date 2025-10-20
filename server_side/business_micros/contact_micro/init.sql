@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS contacts (
   rank VARCHAR(100),
   position VARCHAR(255),
   company VARCHAR(255),
-  avatar_file_id UUID,
+  avatar_url VARCHAR(500),
   date_of_birth DATE,
   locale VARCHAR(10) DEFAULT 'ru',
   timezone TEXT DEFAULT 'Europe/Moscow',

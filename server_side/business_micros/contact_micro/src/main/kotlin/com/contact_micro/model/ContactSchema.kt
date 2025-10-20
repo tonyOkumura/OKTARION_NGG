@@ -22,7 +22,7 @@ data class Contact(
     val rank: String? = null,
     val position: String? = null,
     val company: String? = null,
-    val avatarFileId: String? = null, // UUID
+    val avatarUrl: String? = null, // Avatar URL
     val dateOfBirth: String? = null, // ISO date string
     val locale: String = "ru",
     val timezone: String = "Europe/Moscow",
@@ -44,7 +44,7 @@ data class ContactCreateRequest(
     val rank: String? = null,
     val position: String? = null,
     val company: String? = null,
-    val avatarFileId: String? = null,
+    val avatarUrl: String? = null,
     val dateOfBirth: String? = null,
     val locale: String = "ru",
     val timezone: String = "Europe/Moscow"
@@ -65,7 +65,7 @@ data class ContactUpdateRequest(
     val rank: String? = null,
     val position: String? = null,
     val company: String? = null,
-    val avatarFileId: String? = null,
+    val avatarUrl: String? = null,
     val dateOfBirth: String? = null,
     val locale: String? = null,
     val timezone: String? = null

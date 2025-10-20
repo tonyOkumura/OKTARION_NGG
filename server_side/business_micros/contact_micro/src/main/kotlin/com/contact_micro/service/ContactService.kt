@@ -5,6 +5,7 @@ import com.contact_micro.model.ContactCreateRequest
 import com.contact_micro.model.ContactUpdateRequest
 import com.contact_micro.model.ContactSearchResponse
 import com.contact_micro.config.PaginationConfig
+import com.contact_micro.config.AvatarConfig
 import kotlinx.coroutines.*
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -14,12 +15,12 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class ContactService(private val connection: Connection, private val paginationConfig: PaginationConfig) {
+class ContactService(private val connection: Connection, private val paginationConfig: PaginationConfig, private val avatarConfig: AvatarConfig) {
     companion object {
         private const val SELECT_CONTACT_BY_ID = """
             SELECT id, username, first_name, last_name, display_name, email, phone, 
                    is_online, last_seen_at, status_message, role, department, rank, 
-                   position, company, avatar_file_id, date_of_birth, locale, timezone, 
+                   position, company, avatar_url, date_of_birth, locale, timezone, 
                    created_at, updated_at 
             FROM contacts WHERE id = ?
         """
@@ -27,7 +28,7 @@ class ContactService(private val connection: Connection, private val paginationC
         private const val SELECT_ALL_CONTACTS = """
             SELECT id, username, first_name, last_name, display_name, email, phone, 
                    is_online, last_seen_at, status_message, role, department, rank, 
-                   position, company, avatar_file_id, date_of_birth, locale, timezone, 
+                   position, company, avatar_url, date_of_birth, locale, timezone, 
                    created_at, updated_at 
             FROM contacts 
             WHERE (? IS NULL OR (
@@ -51,14 +52,14 @@ class ContactService(private val connection: Connection, private val paginationC
         private const val INSERT_CONTACT = """
             INSERT INTO contacts (id, username, first_name, last_name, display_name, email, phone, 
                                  status_message, role, department, rank, position, company, 
-                                 avatar_file_id, date_of_birth, locale, timezone) 
+                                 avatar_url, date_of_birth, locale, timezone) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         
         private const val UPDATE_CONTACT = """
             UPDATE contacts SET username = ?, first_name = ?, last_name = ?, display_name = ?, 
                                email = ?, phone = ?, is_online = ?, status_message = ?, role = ?, 
-                               department = ?, rank = ?, position = ?, company = ?, avatar_file_id = ?, 
+                               department = ?, rank = ?, position = ?, company = ?, avatar_url = ?, 
                                date_of_birth = ?, locale = ?, timezone = ?, updated_at = NOW() 
             WHERE id = ?
         """
@@ -94,11 +95,11 @@ class ContactService(private val connection: Connection, private val paginationC
         statement.setString(11, contact.rank)
         statement.setString(12, contact.position)
         statement.setString(13, contact.company)
-        if (contact.avatarFileId != null) {
-            statement.setObject(14, UUID.fromString(contact.avatarFileId))
-        } else {
-            statement.setObject(14, null)
-        }
+        
+        // Автоматически генерируем avatar_url на основе userId
+        val avatarUrl = "${avatarConfig.serviceUrl}/avatars/$userId/download"
+        statement.setString(14, avatarUrl)
+        
         if (contact.dateOfBirth != null) {
             statement.setDate(15, java.sql.Date.valueOf(contact.dateOfBirth))
         } else {
@@ -136,7 +137,7 @@ class ContactService(private val connection: Connection, private val paginationC
         val query = """
             SELECT id, username, first_name, last_name, display_name, email, phone, 
                    is_online, last_seen_at, status_message, role, department, rank, 
-                   position, company, avatar_file_id, date_of_birth, locale, timezone, 
+                   position, company, avatar_url, date_of_birth, locale, timezone, 
                    created_at, updated_at
             FROM contacts 
             WHERE id IN ($placeholders)
@@ -160,26 +161,52 @@ class ContactService(private val connection: Connection, private val paginationC
         return@withContext contacts
     }
     
-    // Read all contacts with search and pagination
-    suspend fun readAll(searchQuery: String? = null, cursor: String? = null, limit: Int? = null): ContactSearchResponse = withContext(Dispatchers.IO) {
+    // Read all contacts with search, pagination, filtering and sorting
+    suspend fun readAll(
+        searchQuery: String? = null, 
+        cursor: String? = null, 
+        limit: Int? = null,
+        filters: Map<String, String>? = null,
+        sortBy: String? = null,
+        sortOrder: String? = null
+    ): ContactSearchResponse = withContext(Dispatchers.IO) {
         val actualLimit = limit ?: paginationConfig.defaultLimit
-        val statement = connection.prepareStatement(SELECT_ALL_CONTACTS)
+        val actualSortBy = sortBy ?: "created_at"
+        val actualSortOrder = if (sortOrder?.uppercase() == "ASC") "ASC" else "DESC"
+        
+        // Строим динамический SQL запрос
+        val query = buildDynamicQuery(filters, actualSortBy, actualSortOrder)
+        val statement = connection.prepareStatement(query)
         
         // Подготавливаем поисковый запрос
         val searchPattern = if (!searchQuery.isNullOrBlank()) "%$searchQuery%" else null
         
+        var paramIndex = 1
+        
         // Устанавливаем параметры поиска (12 параметров: 1 для проверки + 11 для полей)
-        statement.setString(1, searchPattern) // проверка на null
-        for (i in 2..12) {
-            statement.setString(i, searchPattern) // 11 полей для поиска
+        statement.setString(paramIndex++, searchPattern) // проверка на null
+        for (i in 1..11) {
+            statement.setString(paramIndex++, searchPattern) // 11 полей для поиска
+        }
+        
+        // Устанавливаем параметры фильтрации
+        filters?.forEach { (field, value) ->
+            when (field) {
+                "role", "is_online", "locale", "timezone" -> {
+                    statement.setString(paramIndex++, value)
+                }
+                else -> {
+                    statement.setString(paramIndex++, "%$value%")
+                }
+            }
         }
         
         // Устанавливаем параметры курсора (2 параметра)
-        statement.setString(13, cursor) // cursor check
-        statement.setString(14, cursor) // cursor value
+        statement.setString(paramIndex++, cursor) // cursor check
+        statement.setString(paramIndex++, cursor) // cursor value
         
         // Устанавливаем лимит
-        statement.setInt(15, actualLimit + 1) // +1 чтобы проверить hasMore
+        statement.setInt(paramIndex, actualLimit + 1) // +1 чтобы проверить hasMore
         
         val resultSet = statement.executeQuery()
         
@@ -208,7 +235,81 @@ class ContactService(private val connection: Connection, private val paginationC
             nextCursor = nextCursor
         )
     }
-
+    
+    // Build dynamic SQL query with filtering and sorting
+    private fun buildDynamicQuery(filters: Map<String, String>?, sortBy: String, sortOrder: String): String {
+        val baseQuery = """
+            SELECT id, username, first_name, last_name, display_name, email, phone, 
+                   is_online, last_seen_at, status_message, role, department, rank, 
+                   position, company, avatar_url, date_of_birth, locale, timezone, 
+                   created_at, updated_at 
+            FROM contacts 
+            WHERE (? IS NULL OR (
+                LOWER(username) LIKE LOWER(?) OR
+                LOWER(first_name) LIKE LOWER(?) OR
+                LOWER(last_name) LIKE LOWER(?) OR
+                LOWER(display_name) LIKE LOWER(?) OR
+                LOWER(email) LIKE LOWER(?) OR
+                LOWER(phone) LIKE LOWER(?) OR
+                LOWER(status_message) LIKE LOWER(?) OR
+                LOWER(department) LIKE LOWER(?) OR
+                LOWER(rank) LIKE LOWER(?) OR
+                LOWER(position) LIKE LOWER(?) OR
+                LOWER(company) LIKE LOWER(?)
+            ))
+        """
+        
+        // Добавляем фильтры
+        val filterConditions = mutableListOf<String>()
+        filters?.forEach { (field, _) ->
+            when (field) {
+                "role" -> filterConditions.add("role = ?")
+                "department" -> filterConditions.add("LOWER(department) LIKE LOWER(?)")
+                "company" -> filterConditions.add("LOWER(company) LIKE LOWER(?)")
+                "is_online" -> filterConditions.add("is_online = ?")
+                "locale" -> filterConditions.add("locale = ?")
+                "timezone" -> filterConditions.add("timezone = ?")
+                "username" -> filterConditions.add("LOWER(username) LIKE LOWER(?)")
+                "email" -> filterConditions.add("LOWER(email) LIKE LOWER(?)")
+                "phone" -> filterConditions.add("LOWER(phone) LIKE LOWER(?)")
+                "firstName" -> filterConditions.add("LOWER(first_name) LIKE LOWER(?)")
+                "lastName" -> filterConditions.add("LOWER(last_name) LIKE LOWER(?)")
+                "displayName" -> filterConditions.add("LOWER(display_name) LIKE LOWER(?)")
+                "statusMessage" -> filterConditions.add("LOWER(status_message) LIKE LOWER(?)")
+                "rank" -> filterConditions.add("LOWER(rank) LIKE LOWER(?)")
+                "position" -> filterConditions.add("LOWER(position) LIKE LOWER(?)")
+            }
+        }
+        
+        val filterClause = if (filterConditions.isNotEmpty()) {
+            " AND " + filterConditions.joinToString(" AND ")
+        } else ""
+        
+        // Добавляем курсор для пагинации
+        val cursorClause = " AND (? IS NULL OR created_at < ?::timestamp)"
+        
+        // Добавляем сортировку
+        val validSortFields = mapOf(
+            "created_at" to "created_at",
+            "updated_at" to "updated_at",
+            "username" to "username",
+            "firstName" to "first_name",
+            "lastName" to "last_name",
+            "email" to "email",
+            "role" to "role",
+            "department" to "department",
+            "company" to "company"
+        )
+        
+        val actualSortField = validSortFields[sortBy] ?: "created_at"
+        val orderClause = " ORDER BY $actualSortField $sortOrder"
+        
+        // Добавляем лимит
+        val limitClause = " LIMIT ?"
+        
+        return baseQuery + filterClause + cursorClause + orderClause + limitClause
+    }
+    
     // Update a contact
     suspend fun update(id: String, contact: ContactUpdateRequest) = withContext(Dispatchers.IO) {
         // Проверяем уникальность email, username, phone (исключая текущий контакт)
@@ -270,9 +371,9 @@ class ContactService(private val connection: Connection, private val paginationC
             updateFields.add("company = ?")
             parameters.add(it)
         }
-        contact.avatarFileId?.let {
-            updateFields.add("avatar_file_id = ?")
-            parameters.add(UUID.fromString(it))
+        contact.avatarUrl?.let {
+            updateFields.add("avatar_url = ?")
+            parameters.add(it)
         }
         contact.dateOfBirth?.let {
             updateFields.add("date_of_birth = ?")
@@ -344,7 +445,7 @@ class ContactService(private val connection: Connection, private val paginationC
             rank = resultSet.getString("rank"),
             position = resultSet.getString("position"),
             company = resultSet.getString("company"),
-            avatarFileId = resultSet.getString("avatar_file_id"),
+            avatarUrl = resultSet.getString("avatar_url"),
             dateOfBirth = resultSet.getDate("date_of_birth")?.toLocalDate()?.format(dateFormatter),
             locale = resultSet.getString("locale"),
             timezone = resultSet.getString("timezone"),

@@ -88,9 +88,9 @@ fun validateContactCreate(contact: ContactCreateRequest): List<ValidationError> 
         errors.add(ValidationError("company", "Company cannot exceed 255 characters"))
     }
     
-    // Avatar file ID validation (UUID format)
-    if (contact.avatarFileId != null && !isValidUUID(contact.avatarFileId)) {
-        errors.add(ValidationError("avatarFileId", "Avatar file ID must be a valid UUID"))
+    // Avatar URL validation
+    if (contact.avatarUrl != null && !isValidUrl(contact.avatarUrl)) {
+        errors.add(ValidationError("avatarUrl", "Avatar URL must be a valid URL"))
     }
     
     // Date of birth validation
@@ -186,9 +186,9 @@ fun validateContactUpdate(contact: ContactUpdateRequest): List<ValidationError> 
         errors.add(ValidationError("company", "Company cannot exceed 255 characters"))
     }
     
-    // Avatar file ID validation (UUID format)
-    if (contact.avatarFileId != null && !isValidUUID(contact.avatarFileId)) {
-        errors.add(ValidationError("avatarFileId", "Avatar file ID must be a valid UUID"))
+    // Avatar URL validation
+    if (contact.avatarUrl != null && !isValidUrl(contact.avatarUrl)) {
+        errors.add(ValidationError("avatarUrl", "Avatar URL must be a valid URL"))
     }
     
     // Date of birth validation
@@ -228,6 +228,15 @@ private fun isValidUUID(uuid: String): Boolean {
     val uuidPattern = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE)
     val uuidWithoutDashesPattern = Pattern.compile("^[0-9a-f]{32}$", Pattern.CASE_INSENSITIVE)
     return uuidPattern.matcher(uuid).matches() || uuidWithoutDashesPattern.matcher(uuid).matches()
+}
+
+private fun isValidUrl(url: String): Boolean {
+    try {
+        java.net.URL(url)
+        return true
+    } catch (e: Exception) {
+        return false
+    }
 }
 
 private fun isValidDate(date: String): Boolean {

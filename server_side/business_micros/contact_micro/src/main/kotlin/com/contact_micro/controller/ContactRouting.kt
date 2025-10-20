@@ -5,6 +5,7 @@ import com.contact_micro.model.ContactUpdateRequest
 import com.contact_micro.model.ContactSearchResponse
 import com.contact_micro.service.ContactService
 import com.contact_micro.config.PaginationConfig
+import com.contact_micro.config.AvatarConfig
 import com.contact_micro.plugin.validateContactCreate
 import com.contact_micro.plugin.validateContactUpdate
 import com.contact_micro.plugin.respondValidationError
@@ -20,8 +21,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.sql.Connection
 
-fun Application.configureContactRouting(dbConnection: Connection, paginationConfig: PaginationConfig) {
-    val contactService = ContactService(dbConnection, paginationConfig)
+fun Application.configureContactRouting(dbConnection: Connection, paginationConfig: PaginationConfig, avatarConfig: AvatarConfig) {
+    val contactService = ContactService(dbConnection, paginationConfig, avatarConfig)
     
     routing {
         // Create contact
@@ -94,10 +95,29 @@ fun Application.configureContactRouting(dbConnection: Connection, paginationConf
                     )
                     call.respond(HttpStatusCode.OK, result)
                 } else {
-                    // Обычный поиск с пагинацией
-                    call.logWithUser("info", "Searching contacts: query='$searchQuery', cursor='$cursor', limit=$limit")
+                    // Обычный поиск с пагинацией, фильтрацией и сортировкой
+                    
+                    // Получаем параметры фильтрации
+                    val filters = mutableMapOf<String, String>()
+                    val filterFields = listOf("role", "department", "company", "is_online", "locale", "timezone", 
+                                            "username", "email", "phone", "firstName", "lastName", "displayName", 
+                                            "statusMessage", "rank", "position")
+                    
+                    filterFields.forEach { field ->
+                        call.request.queryParameters[field]?.let { value ->
+                            if (value.isNotBlank()) {
+                                filters[field] = value
+                            }
+                        }
+                    }
+                    
+                    // Получаем параметры сортировки
+                    val sortBy = call.request.queryParameters["sortBy"]
+                    val sortOrder = call.request.queryParameters["sortOrder"]
+                    
+                    call.logWithUser("info", "Searching contacts: query='$searchQuery', cursor='$cursor', limit=$limit, filters=$filters, sortBy=$sortBy, sortOrder=$sortOrder")
 
-                    val result = contactService.readAll(searchQuery, cursor, limit)
+                    val result = contactService.readAll(searchQuery, cursor, limit, filters, sortBy, sortOrder)
                     call.logWithUser("info", "Retrieved ${result.contacts.size} contacts, hasMore=${result.hasMore}")
                     call.respond(HttpStatusCode.OK, result)
                 }
