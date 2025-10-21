@@ -7,6 +7,7 @@ import '../../core/core.dart';
 import '../../app/modules/splash/views/splash_view.dart';
 import '../../app/modules/home/views/main_view.dart';
 import '../../app/modules/login/views/login_view.dart';
+import '../../app/modules/login/views/email_confirmation_view.dart';
 import '../../app/modules/login/bindings/login_binding.dart';
 import '../../app/modules/login/controllers/login_controller.dart';
 import '../../app/modules/home/controllers/main_controller.dart';
@@ -75,18 +76,27 @@ class _AuthGateState extends State<AuthGate> {
         final authState = snapshot.data;
         final isAuthenticated = authState?.session != null;
         final user = authState?.session?.user;
+        final isEmailConfirmed = user?.emailConfirmedAt != null;
 
         LogService.i('🔐 AuthGate: User ${isAuthenticated ? 'authenticated' : 'not authenticated'}');
         LogService.i('🔐 AuthGate: AuthState: ${authState?.event}');
         LogService.i('🔐 AuthGate: Session: ${user?.email ?? 'No user'}');
+        LogService.i('🔐 AuthGate: Email confirmed: $isEmailConfirmed');
 
-        if (isAuthenticated && user != null) {
-          // Пользователь авторизован - показываем Home
+        if (isAuthenticated && user != null && isEmailConfirmed) {
+          // Пользователь авторизован и email подтвержден - показываем Home
           // Инициализируем биндинг для MainController
           if (!Get.isRegistered<MainController>()) {
             MainBinding().dependencies();
           }
           return const MainView();
+        } else if (isAuthenticated && user != null && !isEmailConfirmed) {
+          // Пользователь зарегистрирован, но email не подтвержден - показываем экран подтверждения
+          // Инициализируем биндинг для LoginController
+          if (!Get.isRegistered<LoginController>()) {
+            LoginBinding().dependencies();
+          }
+          return const EmailConfirmationView();
         } else {
           // Пользователь не авторизован - показываем Login
           // Очищаем все контроллеры при выходе

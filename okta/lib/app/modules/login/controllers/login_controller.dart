@@ -222,6 +222,7 @@ class LoginController extends GetxController {
       final response = await SupabaseService.instance.client.auth.signUp(
         email: emailController.text.trim(),
         password: passwordController.text,
+        emailRedirectTo: null, // Не перенаправляем, так как это мобильное приложение
       );
 
       if (response.user != null) {
@@ -230,9 +231,7 @@ class LoginController extends GetxController {
         
         NotificationService.instance.showSuccess(
           title: 'Регистрация успешна!',
-          message: response.session != null 
-              ? 'Вы успешно зарегистрированы и вошли в систему'
-              : 'Проверьте email для подтверждения аккаунта',
+          message: 'Проверьте email для подтверждения аккаунта',
           color: _getAccentColor(3),
         );
       } else {

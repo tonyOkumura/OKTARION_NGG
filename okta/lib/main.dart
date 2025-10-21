@@ -10,36 +10,28 @@ import 'core/services/theme_service.dart';
 import 'core/initializers/api_initializer.dart';
 
 void main() async {
-  // Запуск приложения с обработкой ошибок
   runZonedGuarded(() async {
-    // Обеспечиваем инициализацию Flutter bindings
     WidgetsFlutterBinding.ensureInitialized();
     
-    // Инициализация локализации для русского языка
-    LogService.i('🌍 Initializing Russian locale...');
+    LogService.i('Initializing Russian locale...');
     await initializeDateFormatting('ru', null);
     LogService.i('✅ Russian locale initialized successfully');
     
-    // Логирование запуска приложения
     LogService.i('🚀 Starting ${AppConstants.appName} v${AppConstants.appVersion}');
     
     try {
-      // Инициализация Hive
       LogService.i('📦 Initializing Hive storage...');
       await HiveService.instance.init();
       LogService.i('✅ Hive storage initialized successfully');
       
-      // Инициализация сервиса тем
       LogService.i('🎨 Initializing ThemeService...');
       await Get.putAsync(() => ThemeService().init());
       LogService.i('✅ ThemeService initialized successfully');
       
-      // Инициализация Supabase
       LogService.i('🔗 Initializing Supabase...');
       await SupabaseService.instance.init();
       LogService.i('✅ Supabase initialized successfully');
       
-      // Проверка подключения к Supabase
       LogService.i('🔍 Checking Supabase connection...');
       final isConnected = await SupabaseService.instance.checkConnection();
       if (isConnected) {
@@ -48,12 +40,10 @@ void main() async {
         LogService.w('⚠️ Supabase connection check failed, but continuing...');
       }
       
-      // Инициализация API сервисов
       LogService.i('🌐 Initializing API services...');
       await ApiInitializer.initialize();
       LogService.i('✅ API services initialized successfully');
       
-      // Запуск приложения
       LogService.i('🎯 Launching OktarionApp...');
       runApp(const OktarionApp());
       
