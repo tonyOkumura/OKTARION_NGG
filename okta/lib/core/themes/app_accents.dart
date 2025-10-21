@@ -16,16 +16,6 @@ class AppAccents extends ThemeExtension<AppAccents> {
     required this.accent5,
   });
 
-  factory AppAccents.fromScheme(ColorScheme cs) {
-    // Fallback derivation if ever needed; prefer explicit per-theme palettes
-    return AppAccents(
-      accent1: cs.error,
-      accent2: cs.tertiary,
-      accent3: cs.primary,
-      accent4: cs.secondary,
-      accent5: cs.inversePrimary,
-    );
-  }
 
   @override
   AppAccents copyWith({
@@ -68,3 +58,6 @@ extension AppAccentsX on ThemeData {
         accent5: Color(0xff8e24aa),
       );
 }
+
+
+

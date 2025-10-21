@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/core.dart';
-import '../../../../core/enums/app_enums.dart';
+import '../../../../core/services/theme_service.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
@@ -19,6 +19,8 @@ class LoginController extends GetxController {
   final now = DateTime.now().obs;
   final seconds = 0.obs;
   
+  late final ThemeService _themeService;
+  
   // Свойства для проверки сложности пароля
   final passwordStrength = 0.0.obs;
   final passwordStrengthText = ''.obs;
@@ -27,19 +29,21 @@ class LoginController extends GetxController {
   // Свойство для проверки готовности формы
   final isFormValid = false.obs;
 
-  // Сервис для создания контакта после регистрации
-  late final UserPostRegistrationService _userPostRegistrationService;
 
   @override
   void onInit() {
     super.onInit();
+    _themeService = Get.find<ThemeService>();
     LogService.i('🔐 LoginController initialized');
     
-    // Инициализируем сервис для создания контакта после регистрации
-    _userPostRegistrationService = Get.find<UserPostRegistrationService>();
     
     // Обновляем время каждую секунду
     _startTimer();
+  }
+
+  /// Получить акцентный цвет по индексу через ThemeService
+  Color _getAccentColor(int index) {
+    return AccentColorsHelper.getAccentColorByIndexFromTheme(_themeService.themeData, index);
   }
 
   @override
@@ -160,7 +164,7 @@ class LoginController extends GetxController {
         NotificationService.instance.showSuccess(
           title: 'Добро пожаловать!',
           message: 'Вы успешно вошли в систему',
-          color: AppTheme.values[3].primaryColor,
+          color: _getAccentColor(3),
         );
       } else {
         throw Exception('No user returned from sign in');
@@ -189,7 +193,7 @@ class LoginController extends GetxController {
       NotificationService.instance.showError(
         title: 'Ошибка входа',
         message: errorMessage,
-        color: AppTheme.values[0].primaryColor,
+        color: _getAccentColor(0),
       );
     } catch (e, stackTrace) {
       LogService.e('❌ Unexpected error during sign in: $e', e, stackTrace);
@@ -199,7 +203,7 @@ class LoginController extends GetxController {
       NotificationService.instance.showError(
         title: 'Ошибка входа',
         message: 'Произошла ошибка. Попробуйте еще раз',
-        color: AppTheme.values[0].primaryColor,
+        color: _getAccentColor(0),
       );
     } finally {
       isLoading.value = false;
@@ -223,15 +227,13 @@ class LoginController extends GetxController {
       if (response.user != null) {
         LogService.i('✅ Successfully signed up: ${response.user!.email}');
         
-        // Создаем контакт пользователя после успешной регистрации
-        await _createUserContactAfterRegistration();
         
         NotificationService.instance.showSuccess(
           title: 'Регистрация успешна!',
           message: response.session != null 
               ? 'Вы успешно зарегистрированы и вошли в систему'
               : 'Проверьте email для подтверждения аккаунта',
-          color: AppTheme.values[3].primaryColor,
+          color: _getAccentColor(3),
         );
       } else {
         throw Exception('No user returned from sign up');
@@ -263,7 +265,7 @@ class LoginController extends GetxController {
       NotificationService.instance.showError(
         title: 'Ошибка регистрации',
         message: errorMessage,
-        color: AppTheme.values[0].primaryColor,
+        color: _getAccentColor(0),
       );
     } catch (e, stackTrace) {
       LogService.e('❌ Unexpected error during sign up: $e', e, stackTrace);
@@ -273,7 +275,7 @@ class LoginController extends GetxController {
       NotificationService.instance.showError(
         title: 'Ошибка регистрации',
         message: 'Произошла ошибка. Попробуйте еще раз',
-        color: AppTheme.values[0].primaryColor,
+        color: _getAccentColor(0),
       );
     } finally {
       isLoading.value = false;
@@ -289,22 +291,7 @@ class LoginController extends GetxController {
     }
   }
 
-  /// Создать контакт пользователя после успешной регистрации
-  Future<void> _createUserContactAfterRegistration() async {
-    try {
-      // Ждем немного, чтобы сессия успела обновиться
-      await Future.delayed(const Duration(milliseconds: 500));
-      
-      // Создаем контакт пользователя
-      await _userPostRegistrationService.handlePostRegistrationContactCreation();
-      
-      LogService.i('✅ Post-registration contact creation completed');
-    } catch (e) {
-      LogService.e('❌ Error in post-registration contact creation: $e');
-      // Не показываем ошибку пользователю, так как регистрация уже прошла успешно
-    }
-  }
-
+ 
   /// Выйти из системы
   Future<void> signOut() async {
     try {
@@ -317,7 +304,7 @@ class LoginController extends GetxController {
       NotificationService.instance.showInfo(
         title: 'До свидания!',
         message: 'Вы вышли из системы',
-        color: AppTheme.values[2].primaryColor,
+        color: _getAccentColor(2),
       );
 
     } catch (e, stackTrace) {
@@ -326,7 +313,7 @@ class LoginController extends GetxController {
       NotificationService.instance.showError(
         title: 'Ошибка выхода',
         message: 'Не удалось выйти из системы',
-        color: AppTheme.values[0].primaryColor,
+        color: _getAccentColor(0),
       );
     }
   }
@@ -346,7 +333,7 @@ class LoginController extends GetxController {
       NotificationService.instance.showInfo(
         title: 'Гостевой режим',
         message: 'Вы вошли как гость',
-        color: AppTheme.values[2].primaryColor,
+        color: _getAccentColor(2),
       );
 
     } catch (e, stackTrace) {
@@ -355,7 +342,7 @@ class LoginController extends GetxController {
       NotificationService.instance.showError(
         title: 'Ошибка',
         message: 'Не удалось войти как гость',
-        color: AppTheme.values[0].primaryColor,
+        color: _getAccentColor(0),
       );
     } finally {
       isLoading.value = false;

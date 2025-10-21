@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
+import '../../core/core.dart';
 import 'glass_button.dart';
 import 'glass_header_mode_toggle.dart';
-import '../../core/enums/app_enums.dart';
 
 class GlassSearchBar extends StatelessWidget {
   const GlassSearchBar({
@@ -72,11 +72,11 @@ class GlassSearchBar extends StatelessWidget {
                       onPressed: () => onAddPressed?.call(buttonContext),
                       padding: const EdgeInsets.all(8),
                       backgroundColor: cs.surface.withValues(alpha: 0.7),
-                      borderColor: AppTheme.values[3].primaryColor.withValues(alpha: 0.3),
+                      borderColor: cs.primary.withValues(alpha: 0.3),
                       child: Icon(
                         Icons.add_outlined,
                         size: 20,
-                        color: AppTheme.values[3].primaryColor,
+                        color: cs.primary
                       ),
                     ),
                   ),
@@ -163,7 +163,7 @@ class GlassSearchBar extends StatelessWidget {
                   final index = entry.key;
                   final mode = entry.value;
                   // Используем разные акцентные цвета для каждого переключателя
-                  final accentColor = AppTheme.values[index % AppTheme.values.length].primaryColor;
+                  final accentColor = AccentColorsHelper.getAccentColorByIndex(context, index);
                   
                   return Padding(
                     padding: EdgeInsets.only(

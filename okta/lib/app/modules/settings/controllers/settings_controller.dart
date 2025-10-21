@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 
 import '../../../../core/core.dart';
-import '../../../../core/enums/app_enums.dart';
 import '../../../../core/services/theme_service.dart';
 
 class SettingsController extends GetxController {

@@ -3,3 +3,4 @@
 
 export 'notification_service.dart';
 export 'supabase_service.dart';
+export 'theme_service.dart';

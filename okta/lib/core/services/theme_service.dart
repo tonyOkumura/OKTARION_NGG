@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
-import '../enums/app_enums.dart';
 import '../storage/hive_service.dart';
+import '../themes/app_theme.dart';
 
 class ThemeService extends GetxService {
   static const String keyThemeIndex = 'theme_index';

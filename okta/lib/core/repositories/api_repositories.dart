@@ -36,11 +36,4 @@ class ContactsRepository extends BaseRepository {
     );
   }
 
-  // Создать контакт пользователя (после регистрации)
-  Future<ApiResponse<Map<String, dynamic>>> createUserContact(String username) async {
-    return await api.post<Map<String, dynamic>>(
-      ApiEndpoints.createUserContact,
-      data: {'username': username},
-    );
-  }
 }

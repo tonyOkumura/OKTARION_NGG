@@ -31,7 +31,7 @@ class AuthIdentifierField extends StatelessWidget {
         prefixIcon = Icons.email_outlined;
         keyboardType = TextInputType.emailAddress;
         inputFormatters = [
-          InputFormatterHelper.noSpacesFormatter,
+
           LengthLimitingTextInputFormatter(64),
         ];
       } else {
@@ -39,7 +39,7 @@ class AuthIdentifierField extends StatelessWidget {
         prefixIcon = Icons.email_outlined;
         keyboardType = TextInputType.emailAddress;
         inputFormatters = [
-          InputFormatterHelper.noSpacesFormatter,
+
           LengthLimitingTextInputFormatter(64),
         ];
       }

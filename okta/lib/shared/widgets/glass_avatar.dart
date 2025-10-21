@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:async';
 import '../../core/core.dart';
-import '../../core/enums/app_enums.dart';
 import 'glass_loading.dart';
 
 class GlassAvatar extends StatefulWidget {
@@ -101,7 +100,9 @@ class _GlassAvatarState extends State<GlassAvatar> {
     final String initials = _computeInitials(widget.label);
     final double diameter = widget.radius * 2;
     final int idx = _accentIndexForLabel(widget.label);
-    final Color baseColor = widget.textColor ?? AppTheme.values[idx].primaryColor;
+    
+    // Получаем акцентный цвет по индексу
+    final Color baseColor = widget.textColor ?? AccentColorsHelper.getAccentColorByIndex(context, idx);
     final Color bgColor = widget.backgroundColor ?? baseColor.withOpacity(0.25);
 
     return SizedBox(

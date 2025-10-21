@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../themes/app_accents.dart';
+import '../utils/accent_colors_helper.dart';
 
 /// Типы уведомлений
 enum NotificationType {
@@ -161,36 +161,19 @@ class NotificationConfig {
   Color getColor(BuildContext context) {
     if (color != null) return color!;
     
-    final theme = Theme.of(context);
-    final accents = theme.accents;
-    
     switch (type) {
       case NotificationType.success:
-        return accents.accent4; // Зеленый акцент
+        return AccentColorsHelper.getAccentColorByIndex(context, 3); // Зеленый акцент
       case NotificationType.error:
-        return accents.accent1; // Красный акцент
+        return AccentColorsHelper.getAccentColorByIndex(context, 0); // Красный акцент
       case NotificationType.warning:
-        return accents.accent2; // Оранжевый акцент
+        return AccentColorsHelper.getAccentColorByIndex(context, 1); // Оранжевый акцент
       case NotificationType.info:
-        return accents.accent3; // Синий акцент
+        return AccentColorsHelper.getAccentColorByIndex(context, 2); // Синий акцент
       case NotificationType.loading:
-        return accents.accent5; // Фиолетовый акцент
+        return AccentColorsHelper.getAccentColorByIndex(context, 4); // Фиолетовый акцент
     }
   }
 
-  /// Получение стандартного цвета для типа уведомления (без контекста)
-  Color get standardColor {
-    switch (type) {
-      case NotificationType.success:
-        return Colors.green;
-      case NotificationType.error:
-        return Colors.red;
-      case NotificationType.warning:
-        return Colors.orange;
-      case NotificationType.info:
-        return Colors.blue;
-      case NotificationType.loading:
-        return Colors.purple;
-    }
-  }
+  
 }
