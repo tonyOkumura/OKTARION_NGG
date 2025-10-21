@@ -13,7 +13,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - oktarion_contacts_net
       - oktarion_ngg
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U contactuser -d contactdb"]
@@ -29,7 +28,7 @@ services:
       - "${SERVER_PORT:-8040}:${SERVER_PORT:-8040}"
     environment:
       # Database configuration
-      POSTGRES_URL: ${POSTGRES_URL:-jdbc:postgresql://postgres:5432/contactdb}
+      POSTGRES_URL: ${POSTGRES_URL:-jdbc:postgresql://contact_postgres:5432/contactdb}
       POSTGRES_USER: ${POSTGRES_USER:-contactuser}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-contactpass}
       DB_MAX_POOL_SIZE: ${DB_MAX_POOL_SIZE:-10}
@@ -60,7 +59,6 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - oktarion_contacts_net
       - oktarion_ngg
     restart: unless-stopped
     healthcheck:
@@ -74,7 +72,5 @@ volumes:
   postgres_data:
 
 networks:
-  oktarion_contacts_net:
-    driver: bridge
   oktarion_ngg:
     external: true

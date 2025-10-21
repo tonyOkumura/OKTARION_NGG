@@ -38,6 +38,13 @@ fun Application.configureUserAuthentication() {
                 return@intercept
             }
             
+            // Пропускаем webhook эндпоинты (они вызываются автоматически Supabase)
+            val requestPath = call.request.path()
+            if (requestPath.startsWith("/webhook/")) {
+                proceed()
+                return@intercept
+            }
+            
             val oktaUserId = call.request.header("Okta-User-ID")
             
             if (oktaUserId.isNullOrBlank()) {

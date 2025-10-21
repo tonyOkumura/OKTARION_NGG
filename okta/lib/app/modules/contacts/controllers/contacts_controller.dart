@@ -1,7 +1,10 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:okta/app/modules/contacts/widgets/contacts_filters.dart';
+import 'package:okta/app/modules/contacts/widgets/contacts_sorting.dart';
 import 'dart:async';
 import '../../../../shared/widgets/widgets.dart';
+import '../../../../core/config/work_types.dart';
 import '../../../../core/core.dart';
 
 class ContactsController extends GetxController {
@@ -31,14 +34,21 @@ class ContactsController extends GetxController {
   final RxBool filterEmployees = false.obs;
   final RxBool filterWithAvatars = false.obs;
   final RxBool filterActive = false.obs;
-  final RxBool filterByDepartment = false.obs;
+  // Новые enum-фильтры
+  final Rxn<DepartmentType> filterDepartment = Rxn<DepartmentType>();
+  final Rxn<CompanyType> filterCompany = Rxn<CompanyType>();
+  final Rxn<PositionType> filterPosition = Rxn<PositionType>();
+  final Rxn<RankType> filterRank = Rxn<RankType>();
+  final Rxn<StatusType> filterStatus = Rxn<StatusType>();
   
   // Сортировка
   final RxString sortBy = 'username'.obs;
   final RxString sortOrder = 'ASC'.obs;
 
   // Геттеры для активных состояний
-  bool get hasActiveFilters => filterEmployees.value || filterWithAvatars.value || filterActive.value || filterByDepartment.value;
+  bool get hasActiveFilters => filterEmployees.value || filterWithAvatars.value || filterActive.value ||
+      filterDepartment.value != null || filterCompany.value != null || filterPosition.value != null ||
+      filterRank.value != null || filterStatus.value != null;
   bool get hasActiveSort => sortBy.value != 'username' || sortOrder.value != 'ASC';
 
   // Сброс фильтров
@@ -46,7 +56,11 @@ class ContactsController extends GetxController {
     filterEmployees.value = false;
     filterWithAvatars.value = false;
     filterActive.value = false;
-    filterByDepartment.value = false;
+    filterDepartment.value = null;
+    filterCompany.value = null;
+    filterPosition.value = null;
+    filterRank.value = null;
+    filterStatus.value = null;
   }
 
   // Сброс сортировки
@@ -156,8 +170,8 @@ class ContactsController extends GetxController {
       context: buttonContext,
       targetContext: buttonContext,
       link: filterButtonLink,
-      width: 280,
-      height: 200,
+      width: 320,
+      height: 490,
       onDismiss: () => _popoverEntry = null,
       builder: (context) => GlassPopover(
         title: 'Фильтры контактов',
@@ -165,41 +179,25 @@ class ContactsController extends GetxController {
           resetFilters();
           _closePopover();
         },
-        child: Obx(() => Column(
-          children: [
-            CheckboxListTile(
-              title: const Text('Только сотрудники'),
-              value: filterEmployees.value,
-              onChanged: (value) => filterEmployees.value = value ?? false,
-            ),
-            CheckboxListTile(
-              title: const Text('С аватарами'),
-              value: filterWithAvatars.value,
-              onChanged: (value) => filterWithAvatars.value = value ?? false,
-            ),
-            CheckboxListTile(
-              title: const Text('Активные'),
-              value: filterActive.value,
-              onChanged: (value) => filterActive.value = value ?? false,
-            ),
-            CheckboxListTile(
-              title: const Text('По отделам'),
-              value: filterByDepartment.value,
-              onChanged: (value) => filterByDepartment.value = value ?? false,
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Применить фильтры
-                  refreshContacts();
-                  _closePopover();
-                },
-                child: const Text('Применить'),
-              ),
-            ),
-          ],
+        child: Obx(() => ContactsFiltersWidget(
+          department: filterDepartment.value,
+          onDepartmentChanged: (v) => filterDepartment.value = v,
+          company: filterCompany.value,
+          onCompanyChanged: (v) => filterCompany.value = v,
+          position: filterPosition.value,
+          onPositionChanged: (v) => filterPosition.value = v,
+          rank: filterRank.value,
+          onRankChanged: (v) => filterRank.value = v,
+          status: filterStatus.value,
+          onStatusChanged: (v) => filterStatus.value = v,
+          onApply: () {
+            refreshContacts();
+            _closePopover();
+          },
+          onClear: () {
+            resetFilters();
+            _closePopover();
+          },
         )),
       ),
     );
@@ -216,8 +214,8 @@ class ContactsController extends GetxController {
       context: buttonContext,
       targetContext: buttonContext,
       link: sortButtonLink,
-      width: 250,
-      height: 180,
+      width: 320,
+      height: 250,
       onDismiss: () => _popoverEntry = null,
       builder: (context) => GlassPopover(
         title: 'Сортировка',
@@ -225,58 +223,19 @@ class ContactsController extends GetxController {
           resetSort();
           _closePopover();
         },
-        child: Obx(() => Column(
-          children: [
-            RadioListTile<String>(
-              title: const Text('По username'),
-              value: 'username',
-              groupValue: sortBy.value,
-              onChanged: (value) => sortBy.value = value ?? 'username',
-            ),
-            RadioListTile<String>(
-              title: const Text('По имени'),
-              value: 'firstName',
-              groupValue: sortBy.value,
-              onChanged: (value) => sortBy.value = value ?? 'username',
-            ),
-            RadioListTile<String>(
-              title: const Text('По должности'),
-              value: 'position',
-              groupValue: sortBy.value,
-              onChanged: (value) => sortBy.value = value ?? 'username',
-            ),
-            RadioListTile<String>(
-              title: const Text('По отделу'),
-              value: 'department',
-              groupValue: sortBy.value,
-              onChanged: (value) => sortBy.value = value ?? 'username',
-            ),
-            const Divider(),
-            RadioListTile<String>(
-              title: const Text('По возрастанию'),
-              value: 'ASC',
-              groupValue: sortOrder.value,
-              onChanged: (value) => sortOrder.value = value ?? 'ASC',
-            ),
-            RadioListTile<String>(
-              title: const Text('По убыванию'),
-              value: 'DESC',
-              groupValue: sortOrder.value,
-              onChanged: (value) => sortOrder.value = value ?? 'ASC',
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Применить сортировку
-                  refreshContacts();
-                  _closePopover();
-                },
-                child: const Text('Применить'),
-              ),
-            ),
-          ],
+        child: Obx(() => ContactsSortingWidget(
+          sortBy: sortBy.value,
+          onSortByChanged: (v) => sortBy.value = v ?? 'username',
+          sortOrder: sortOrder.value,
+          onSortOrderChanged: (v) => sortOrder.value = v ?? 'ASC',
+          onApply: () {
+            refreshContacts();
+            _closePopover();
+          },
+          onClear: () {
+            resetSort();
+            _closePopover();
+          },
         )),
       ),
     );

@@ -405,6 +405,8 @@ services:
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
       - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
+      # Contact microservice webhook integration
+      - ./volumes/db/init/contact_webhook.sql:/docker-entrypoint-initdb.d/init-scripts/99-contact-webhook.sql:Z
       # Must be superuser to alter reserved role
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       # Initialize the database settings with JWT_SECRET and JWT_EXP
@@ -453,6 +455,9 @@ services:
         "-c",
         "log_min_messages=fatal" # prevents Realtime polling queries from appearing in logs
       ]
+    networks:
+      - default
+      - oktarion_ngg
 
   vector:
     container_name: supabase-vector

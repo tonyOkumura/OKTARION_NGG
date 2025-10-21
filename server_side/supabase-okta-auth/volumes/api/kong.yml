@@ -240,6 +240,18 @@ services:
         config:
           user_id_field: "sub"
           header_name: "${JWT_USER_ID_HEADER}"
+
+  ## Contact Microservice Webhook routes
+  - name: contact-microservice-webhook
+    _comment: 'Contact Microservice Webhook: /api/v1/webhook/* -> http://contact_microservice:8040/webhook/*'
+    url: http://contact_microservice:8040/
+    routes:
+      - name: contact-microservice-webhook-all
+        strip_path: true
+        paths:
+          - /api/v1/webhook/
+    plugins:
+      - name: cors
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
     _comment: 'Studio: /* -> http://studio:3000/*'

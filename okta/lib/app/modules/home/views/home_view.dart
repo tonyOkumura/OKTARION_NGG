@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'dart:math' as math;
 
 import '../../../../shared/widgets/widgets.dart';
+import '../../../../core/models/contact_model.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -25,7 +26,7 @@ class HomeView extends GetView<HomeController> {
       return ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
               color: cs.surface.withValues(alpha: 0.7),
@@ -92,145 +93,29 @@ class HomeView extends GetView<HomeController> {
   }
 }
 
-/// Карточка профиля
-class HomeCardProfile extends StatelessWidget {
+/// Карточка аватара
+class HomeCardProfile extends GetView<HomeController> {
   const HomeCardProfile({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    
-    return HomeCard(
-      title: 'Профиль',
+    return Obx(() => HomeCard(
+      title: 'Аватар',
       icon: Icons.person_outline,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const GlassAvatar(
-                label: 'John Doe',
-                radius: 32,
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'John Doe',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: cs.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'john.doe@example.com',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: cs.primaryContainer.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: cs.primary.withOpacity(0.3)),
-                      ),
-                      child: Text(
-                        'Активен',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: cs.onPrimaryContainer,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _StatItem(
-                  label: 'Проекты',
-                  value: '12',
-                  icon: Icons.folder_outlined,
-                  color: cs.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _StatItem(
-                  label: 'Задачи',
-                  value: '8',
-                  icon: Icons.check_circle_outline,
-                  color: cs.secondary,
-                ),
-              ),
-            ],
-          ),
-        ],
+      child: Center(
+        child: GlassAvatar(
+          label: controller.userName.value ?? 'Пользователь',
+          avatarUrl: controller.userAvatarUrl.value,
+          radius: 150,
+        ),
       ),
-    );
+    ));
   }
 }
 
-class _StatItem extends StatelessWidget {
-  const _StatItem({
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.color,
-  });
 
-  final String label;
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-    
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.2)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: cs.onSurface,
-            ),
-          ),
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: cs.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Карточка приветствия
-class HomeCardWelcome extends StatelessWidget {
+/// Карточка "О себе"
+class HomeCardWelcome extends GetView<HomeController> {
   const HomeCardWelcome({super.key});
 
   @override
@@ -238,55 +123,157 @@ class HomeCardWelcome extends StatelessWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     
-    return HomeCard(
-      title: 'Добро пожаловать',
-      icon: Icons.home_outlined,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Icon(
-              Icons.dashboard_outlined,
-              color: cs.primary,
-              size: 48,
-            ),
+    return Obx(() => Stack(
+      children: [
+        HomeCard(
+          title: 'О себе',
+          icon: Icons.person_outline,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          // Имя пользователя
+          Row(
+            children: [
+              Icon(
+                Icons.person_outline,
+                size: 18,
+                color: cs.onSurfaceVariant,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Имя:',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: cs.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  controller.userName.value ?? 'Пользователь',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          
+          // Статус активности
+          Row(
+            children: [
+              Icon(
+                Icons.circle,
+                size: 18,
+                color: Colors.green,
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Статус:',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: cs.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Активен',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.green,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
-          Text(
-            'OKTARION Dashboard',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: cs.onSurface,
-            ),
-            textAlign: TextAlign.center,
+          
+          // Основная информация
+          _buildInfoRow(
+            theme,
+            cs,
+            Icons.email_outlined,
+            'Email',
+            controller.userEmail.value ?? 'user@example.com',
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Ваш персональный дашборд готов к работе. Здесь вы можете управлять всеми аспектами вашей деятельности.',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: cs.onSurfaceVariant,
-            ),
-            textAlign: TextAlign.center,
+          const SizedBox(height: 12),
+          
+          _buildInfoRow(
+            theme,
+            cs,
+            Icons.phone_outlined,
+            'Телефон',
+            controller.userPhone.value ?? '+7 (999) 123-45-67',
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
+          
+          _buildInfoRow(
+            theme,
+            cs,
+            Icons.work_outline,
+            'Должность',
+            controller.userPosition.value ?? 'Developer',
+          ),
+          const SizedBox(height: 12),
+          
+          _buildInfoRow(
+            theme,
+            cs,
+            Icons.business_outlined,
+            'Отдел',
+            controller.userDepartment.value ?? 'Разработка',
+          ),
+          const SizedBox(height: 12),
+          
+          _buildInfoRow(
+            theme,
+            cs,
+            Icons.business,
+            'Компания',
+            controller.userCompany.value ?? 'OKTARION',
+          ),
+          const SizedBox(height: 16),
+          
+          // Статус сообщение
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: cs.primaryContainer.withOpacity(0.3),
+              color: cs.surfaceVariant.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: cs.primary.withOpacity(0.2)),
+              border: Border.all(color: cs.outline.withValues(alpha: 0.2)),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.trending_up, color: cs.primary, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Все системы работают нормально',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: cs.onPrimaryContainer,
-                      fontWeight: FontWeight.w600,
+                Row(
+                  children: [
+                    Icon(
+                      Icons.message_outlined,
+                      size: 16,
+                      color: cs.onSurfaceVariant,
                     ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Статус сообщение',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: cs.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  controller.userStatusMessage.value ?? 'Добро пожаловать! 👋',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
               ],
@@ -294,6 +281,101 @@ class HomeCardWelcome extends StatelessWidget {
           ),
         ],
       ),
+    ),
+        // Плавающая кнопка "Изменить"
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: GlassIconButton(
+            icon: Icons.edit_outlined,
+            onPressed: () => _showEditDialog(context),
+            tooltip: 'Редактировать',
+          ),
+        ),
+      ],
+    ));
+  }
+
+  void _showEditDialog(BuildContext context) {
+    // Создаем временный контакт из данных пользователя
+    final userContact = Contact(
+      id: 'current-user',
+      username: controller.userName.value?.split('@').first ?? 'user',
+      firstName: controller.userName.value?.split(' ').first,
+      lastName: controller.userName.value != null && controller.userName.value!.split(' ').length > 1 
+          ? controller.userName.value!.split(' ').skip(1).join(' ')
+          : null,
+      displayName: controller.userName.value,
+      email: controller.userEmail.value,
+      phone: controller.userPhone.value,
+      isOnline: true,
+      lastSeenAt: DateTime.now(),
+      statusMessage: controller.userStatusMessage.value,
+      role: 'user',
+      department: controller.userDepartment.value,
+      rank: null,
+      position: controller.userPosition.value,
+      company: controller.userCompany.value,
+      avatarUrl: controller.userAvatarUrl.value,
+      dateOfBirth: null,
+      locale: 'ru',
+      timezone: 'Europe/Moscow',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => ContactEditingDialog(
+        contact: userContact,
+        onSave: (updatedContact) {
+          // TODO: Обновить данные пользователя через API
+          Get.snackbar(
+            'Успех',
+            'Профиль обновлен',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Get.theme.colorScheme.primary.withValues(alpha: 0.1),
+            colorText: Get.theme.colorScheme.primary,
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(
+    ThemeData theme,
+    ColorScheme cs,
+    IconData icon,
+    String label,
+    String value,
+  ) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 18,
+          color: cs.onSurfaceVariant,
+        ),
+        const SizedBox(width: 12),
+        Text(
+          '$label:',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: cs.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
     );
   }
 }

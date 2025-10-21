@@ -21,8 +21,8 @@ class GlassPageHeader extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+    child: BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
             color: colorScheme.surface.withValues(alpha: 0.7),

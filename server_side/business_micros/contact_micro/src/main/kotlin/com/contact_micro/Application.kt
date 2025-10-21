@@ -10,9 +10,11 @@ import com.contact_micro.plugin.configureUserAuthentication
 import com.contact_micro.infrastructure.configureDatabases
 import com.contact_micro.plugin.configureErrorHandling
 import com.contact_micro.plugin.configureHealthCheck
+import com.contact_micro.controller.configureWebhookRouting
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.routing.*
 
 fun main() {
     // Используем значения по умолчанию для main()
@@ -27,16 +29,25 @@ fun Application.module() {
     // Configure core components
     configureLogging()
     configureSecurity()
-    configureUserAuthentication()
     configureSerialization()
     configureValidation()
     configureErrorHandling()
     configureGracefulShutdown()
     
     // Configure business logic
-    configureDatabases()
+    val dbConnection = configureDatabases()
     configureHealthCheck()
-    configureRouting()
+    
+    // Configure webhook routing in separate module (no authentication)
+    routing {
+        configureWebhookRouting(dbConnection)
+    }
+    
+    // Configure authentication for main routes
+    configureUserAuthentication()
+    
+    // Configure main routing AFTER authentication
+    configureMainRouting(dbConnection)
     
     // Configure frameworks
     configureFrameworks()

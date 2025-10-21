@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'glass_icon_button.dart';
 
 class GlassPopover extends StatelessWidget {
   const GlassPopover({
@@ -42,11 +43,10 @@ class GlassPopover extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          IconButton(
-            onPressed: onClose,
-            icon: Icon(closeIcon ?? Icons.refresh_rounded),
-            visualDensity: VisualDensity.compact,
+          GlassIconButton(
+            icon: closeIcon ?? Icons.refresh_rounded,
             tooltip: 'Сбросить',
+            onPressed: onClose,
           ),
         ],
       ),
@@ -56,9 +56,9 @@ class GlassPopover extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: cs.surface.withValues(alpha: 0.7),
+        color: cs.surface.withValues(alpha: 0.4),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: cs.outline.withValues(alpha: 0.15)),
+        border: Border.all(color: cs.primary.withValues(alpha: 0.25), width: 1),
       ),
       child: Material(
         type: MaterialType.transparency,
@@ -81,7 +81,7 @@ class GlassPopover extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: box,
       ),
     );

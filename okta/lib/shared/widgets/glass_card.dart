@@ -33,7 +33,7 @@ class GlassCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: borderRadius ?? BorderRadius.circular(UIConstants.radius16),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             padding: padding ?? const EdgeInsets.all(16),
             decoration: BoxDecoration(

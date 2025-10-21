@@ -15,7 +15,7 @@ class GlassVersionCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(UIConstants.radius12),
       child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: UIConstants.spacing12,

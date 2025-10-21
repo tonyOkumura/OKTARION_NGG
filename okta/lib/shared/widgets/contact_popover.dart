@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/models/contact_model.dart';
 import 'glass_avatar.dart';
+import 'contact_editing_dialog.dart';
 
 /// Поповер с детальной информацией о контакте
 class ContactPopover extends StatelessWidget {
@@ -71,13 +72,7 @@ class ContactPopover extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (onClose != null)
-                    IconButton(
-                      onPressed: onClose,
-                      icon: const Icon(Icons.close_rounded),
-                      visualDensity: VisualDensity.compact,
-                      tooltip: 'Закрыть',
-                    ),
+               
                 ],
               ),
 
@@ -296,5 +291,23 @@ class ContactPopover extends StatelessWidget {
     } else {
       return '${lastSeen.day}.${lastSeen.month}.${lastSeen.year}';
     }
+  }
+
+  void _showEditDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => ContactEditingDialog(
+        contact: contact,
+        onSave: (updatedContact) {
+          // TODO: Обновить контакт в списке
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Контакт ${updatedContact.displayNameOrUsername} обновлен'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        },
+      ),
+    );
   }
 }

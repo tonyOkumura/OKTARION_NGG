@@ -25,3 +25,8 @@ export 'home_card.dart';
 export 'contact_popover.dart';
 export 'theme_toggle_button.dart';
 export 'contact_card.dart';
+export 'contact_editing_dialog.dart';
+export 'glass_dialog.dart';
+export 'glass_icon_button.dart';
+export 'glass_dropdown.dart';
+export 'glass_text_field.dart';

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'glass_loading.dart';
+import 'glass_icon_button.dart';
 
 /// Стеклянное уведомление с эффектом размытия
 /// Предоставляет красивый UI для отображения уведомлений
@@ -46,7 +47,7 @@ class GlassNotification extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           width: 380,
           decoration: BoxDecoration(
@@ -108,19 +109,6 @@ class GlassNotification extends StatelessWidget {
                         Text(message!, style: theme.textTheme.bodySmall),
                       ],
                     ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Opacity(
-                opacity: contentOpacity,
-                child: IconButton(
-                  visualDensity: VisualDensity.compact,
-                  splashRadius: 18,
-                  onPressed: onClose,
-                  icon: Icon(
-                    Icons.close_rounded,
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),
                 ),
               ),

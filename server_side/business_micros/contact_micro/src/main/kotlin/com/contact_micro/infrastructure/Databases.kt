@@ -6,7 +6,7 @@ import io.ktor.server.application.*
 import java.sql.Connection
 import java.sql.DriverManager
 
-fun Application.configureDatabases() {
+fun Application.configureDatabases(): Connection {
     val config = getAppConfig()
     val dbConnection: Connection = connectToPostgres(embedded = false)
     
@@ -49,6 +49,8 @@ fun Application.configureDatabases() {
     //         // MyRecord::class at myTopic // <-- Will register schema upon startup
     //     }
     // }
+    
+    return dbConnection
 }
 /**
  * Makes a connection to a Postgres database.

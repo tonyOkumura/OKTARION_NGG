@@ -66,7 +66,7 @@ class _AppSidebar extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Obx(() {
             final selected = controller.selectedIndex.value;
             return AnimatedContainer(

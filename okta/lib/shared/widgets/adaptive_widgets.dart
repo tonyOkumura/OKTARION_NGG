@@ -560,7 +560,7 @@ class AdaptiveButton extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
         child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(

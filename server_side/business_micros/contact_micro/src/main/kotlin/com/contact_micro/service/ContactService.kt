@@ -76,37 +76,33 @@ class ContactService(private val connection: Connection, private val paginationC
 
     // Create new contact
     suspend fun create(contact: ContactCreateRequest, userId: String): String = withContext(Dispatchers.IO) {
-        // Проверяем уникальность email, username, phone
-        validateUniqueFields(contact.email, contact.username, contact.phone)
+        // Проверяем уникальность email
+        validateUniqueFields(contact.email, null, null)
         
         val statement = connection.prepareStatement(INSERT_CONTACT)
         
         // Устанавливаем ID из заголовка Okta-User-ID
         statement.setObject(1, UUID.fromString(userId))
-        statement.setString(2, contact.username)
-        statement.setString(3, contact.firstName)
-        statement.setString(4, contact.lastName)
-        statement.setString(5, contact.displayName)
+        statement.setString(2, null) // username - будет заполнен через PUT
+        statement.setString(3, null) // firstName - будет заполнен через PUT
+        statement.setString(4, null) // lastName - будет заполнен через PUT
+        statement.setString(5, null) // displayName - будет заполнен через PUT
         statement.setString(6, contact.email)
-        statement.setString(7, contact.phone)
-        statement.setString(8, contact.statusMessage)
-        statement.setString(9, contact.role)
-        statement.setString(10, contact.department)
-        statement.setString(11, contact.rank)
-        statement.setString(12, contact.position)
-        statement.setString(13, contact.company)
+        statement.setString(7, null) // phone - будет заполнен через PUT
+        statement.setString(8, null) // statusMessage - будет заполнен через PUT
+        statement.setString(9, "user") // role - по умолчанию user
+        statement.setString(10, null) // department - будет заполнен через PUT
+        statement.setString(11, null) // rank - будет заполнен через PUT
+        statement.setString(12, null) // position - будет заполнен через PUT
+        statement.setString(13, null) // company - будет заполнен через PUT
         
         // Автоматически генерируем avatar_url на основе userId
         val avatarUrl = "${avatarConfig.serviceUrl}/avatars/$userId/download"
         statement.setString(14, avatarUrl)
         
-        if (contact.dateOfBirth != null) {
-            statement.setDate(15, java.sql.Date.valueOf(contact.dateOfBirth))
-        } else {
-            statement.setDate(15, null)
-        }
-        statement.setString(16, contact.locale)
-        statement.setString(17, contact.timezone)
+        statement.setDate(15, null) // dateOfBirth - будет заполнен через PUT
+        statement.setString(16, "ru") // locale - по умолчанию ru
+        statement.setString(17, "Europe/Moscow") // timezone - по умолчанию Europe/Moscow
 
         statement.executeUpdate()
         

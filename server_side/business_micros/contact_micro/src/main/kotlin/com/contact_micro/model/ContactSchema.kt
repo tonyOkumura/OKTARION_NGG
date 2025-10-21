@@ -32,22 +32,7 @@ data class Contact(
 
 @Serializable
 data class ContactCreateRequest(
-    val username: String? = null,
-    val firstName: String? = null,
-    val lastName: String? = null,
-    val displayName: String? = null,
-    val email: String? = null,
-    val phone: String? = null,
-    val statusMessage: String? = null,
-    val role: String = "user",
-    val department: String? = null,
-    val rank: String? = null,
-    val position: String? = null,
-    val company: String? = null,
-    val avatarUrl: String? = null,
-    val dateOfBirth: String? = null,
-    val locale: String = "ru",
-    val timezone: String = "Europe/Moscow"
+    val email: String
 )
 
 @Serializable

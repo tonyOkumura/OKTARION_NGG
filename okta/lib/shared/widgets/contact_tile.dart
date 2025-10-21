@@ -3,6 +3,7 @@ import '../../../../core/models/contact_model.dart';
 import '../../../../shared/widgets/glass_avatar.dart';
 import '../../../../shared/widgets/contact_popover.dart';
 import '../../../../shared/widgets/glass_popover.dart';
+import '../../../../shared/widgets/glass_icon_button.dart';
 
 /// Компактная плиточка контакта для списков
 class ContactTile extends StatefulWidget {
@@ -160,30 +161,10 @@ class _ContactTileState extends State<ContactTile> {
                 // Кнопка "написать"
                 if (widget.onMessagePressed != null) ...[
                   const SizedBox(width: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cs.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: cs.primary.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Material(
-                      type: MaterialType.transparency,
-                      child: InkWell(
-                        onTap: widget.onMessagePressed,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Icon(
-                            Icons.message_outlined,
-                            size: 18,
-                            color: cs.primary,
-                          ),
-                        ),
-                      ),
-                    ),
+                  GlassIconButton(
+                    icon: Icons.message_outlined,
+                    onPressed: widget.onMessagePressed,
+                    tooltip: 'Написать',
                   ),
                 ],
               ],
@@ -248,7 +229,7 @@ class _ContactTileWithPopoverState extends State<_ContactTileWithPopover> {
       targetContext: buttonContext,
       link: _layerLink,
       width: 300,
-      height: 400,
+      height: 500,
       mouseOffset: mousePosition, // Передаем позицию мыши
       onDismiss: () => _popoverEntry = null,
       builder: (context) => ContactPopover(

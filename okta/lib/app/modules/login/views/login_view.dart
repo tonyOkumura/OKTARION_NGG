@@ -54,7 +54,7 @@ class LoginView extends GetView<LoginController> {
                 return ClipRRect(
                 borderRadius: BorderRadius.circular(UIConstants.radius12),
                 child: BackdropFilter(
-                  filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                  filter: ui.ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: UIConstants.spacing8,
@@ -122,7 +122,7 @@ class LoginView extends GetView<LoginController> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(UIConstants.radius24),
                   child: BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                    filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                     child: Container(
                       decoration: BoxDecoration(
                         color: colorScheme.surface.withValues(alpha: 0.1),
