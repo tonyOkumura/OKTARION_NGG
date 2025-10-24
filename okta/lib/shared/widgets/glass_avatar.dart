@@ -33,6 +33,8 @@ class GlassAvatar extends StatefulWidget {
 class _GlassAvatarState extends State<GlassAvatar> {
   Timer? _timeoutTimer;
   bool _hasTimedOut = false;
+  bool _imageLoaded = false;
+  bool _imageError = false;
 
   static int _accentIndexForLabel(String label) {
     if (label.isEmpty) return 0;
@@ -77,15 +79,61 @@ class _GlassAvatarState extends State<GlassAvatar> {
   @override
   void initState() {
     super.initState();
-    // Устанавливаем таймаут в 2 секунды
+    // Устанавливаем таймаут в 5 секунд только если есть URL
     if (widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty) {
-      _timeoutTimer = Timer(const Duration(seconds: 2), () {
-        if (mounted) {
+      _timeoutTimer = Timer(const Duration(seconds: 5), () {
+        if (mounted && !_imageLoaded && !_imageError) {
           setState(() {
             _hasTimedOut = true;
           });
         }
       });
+    }
+  }
+
+  /// Отменить таймаут при успешной загрузке изображения
+  void _onImageLoaded() {
+    _timeoutTimer?.cancel();
+    if (mounted) {
+      setState(() {
+        _imageLoaded = true;
+        _hasTimedOut = false;
+      });
+    }
+  }
+
+  /// Отменить таймаут при ошибке загрузки изображения
+  void _onImageError() {
+    _timeoutTimer?.cancel();
+    if (mounted) {
+      setState(() {
+        _imageError = true;
+        _hasTimedOut = false;
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(GlassAvatar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // Если URL изменился, сбрасываем состояние
+    if (oldWidget.avatarUrl != widget.avatarUrl) {
+      _timeoutTimer?.cancel();
+      _hasTimedOut = false;
+      _imageLoaded = false;
+      _imageError = false;
+      
+      // Устанавливаем новый таймаут если есть URL
+      if (widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty) {
+        _timeoutTimer = Timer(const Duration(seconds: 5), () {
+          if (mounted && !_imageLoaded && !_imageError) {
+            setState(() {
+              _hasTimedOut = true;
+            });
+          }
+        });
+      }
     }
   }
 
@@ -124,7 +172,7 @@ class _GlassAvatarState extends State<GlassAvatar> {
                   : null,
             ),
           ),
-          if (widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty && !_hasTimedOut)
+          if (widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty && !_hasTimedOut && !_imageError)
             ClipOval(
               child: CachedNetworkImage(
                 imageUrl: widget.avatarUrl!,
@@ -142,6 +190,7 @@ class _GlassAvatarState extends State<GlassAvatar> {
                 errorWidget: (context, url, error) {
                   // Логируем ошибку для отладки
                   debugPrint('GlassAvatar: Failed to load image $url - $error');
+                  _onImageError();
                   return Center(
                     child: Text(
                       initials,
@@ -151,6 +200,18 @@ class _GlassAvatarState extends State<GlassAvatar> {
                         fontSize: (widget.radius * 0.85).clamp(10.0, 18.0),
                       ),
                     ),
+                  );
+                },
+                // Колбэк успешной загрузки
+                imageBuilder: (context, imageProvider) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _onImageLoaded();
+                  });
+                  return Image(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
+                    width: diameter,
+                    height: diameter,
                   );
                 },
                 // Настройки кэширования
@@ -163,7 +224,7 @@ class _GlassAvatarState extends State<GlassAvatar> {
                 useOldImageOnUrlChange: false,
               ),
             ),
-          if (widget.avatarUrl == null || widget.avatarUrl!.isEmpty || _hasTimedOut)
+          if (widget.avatarUrl == null || widget.avatarUrl!.isEmpty || _hasTimedOut || _imageError)
             Center(
               child: Text(
                 initials,

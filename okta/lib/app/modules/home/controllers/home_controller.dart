@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/core.dart';
@@ -22,11 +23,15 @@ class HomeController extends GetxController {
   
   // Репозиторий для работы с API
   late final ContactsRepository _repository;
+  
+  // Сервис для работы с файлами
+  late final FileService _fileService;
 
   @override
   void onInit() {
     super.onInit();
     _repository = Get.find<ContactsRepository>();
+    _fileService = Get.find<FileService>();
   }
 
   Future<void> loadData() async {
@@ -200,6 +205,58 @@ class HomeController extends GetxController {
     } catch (e, stackTrace) {
       LogService.e('❌ Failed to update profile: $e', e, stackTrace);
       errorText.value = 'Не удалось обновить профиль';
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Загрузить аватарку пользователя
+  Future<bool> uploadAvatar() async {
+    try {
+      LogService.i('📤 Starting avatar upload...');
+      
+      // Показываем диалог выбора источника изображения
+      final File? imageFile = await _fileService.showImageSourceDialog();
+      
+      if (imageFile == null) {
+        LogService.i('📤 Avatar upload cancelled by user');
+        return false;
+      }
+
+      isLoading.value = true;
+      errorText.value = null;
+
+      // Загружаем аватарку
+      final response = await _fileService.uploadAvatar(imageFile);
+      
+      if (response.success) {
+        LogService.i('✅ Avatar uploaded successfully');
+        
+        // Обновляем URL аватарки в локальных данных
+        // URL формируется автоматически в микросервисе контактов
+        await loadData(); // Перезагружаем данные для получения обновленного URL
+        
+        // Показываем уведомление об успехе
+        NotificationService.instance.showSuccess(
+          title: 'Успех',
+          message: 'Аватарка успешно загружена',
+        );
+        
+        return true;
+      } else {
+        throw Exception('Failed to upload avatar: ${response.message}');
+      }
+    } catch (e, stackTrace) {
+      LogService.e('❌ Failed to upload avatar: $e', e, stackTrace);
+      errorText.value = 'Не удалось загрузить аватарку';
+      
+      // Показываем уведомление об ошибке
+      NotificationService.instance.showError(
+        title: 'Ошибка',
+        message: 'Не удалось загрузить аватарку',
+      );
+      
       return false;
     } finally {
       isLoading.value = false;

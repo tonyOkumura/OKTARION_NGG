@@ -252,6 +252,22 @@ services:
           - /api/v1/webhook/
     plugins:
       - name: cors
+
+  ## File Microservice routes
+  - name: file-microservice
+    _comment: 'File Microservice: /api/v1/files/* -> http://file_microservice:8060/*'
+    url: http://file_microservice:8060/
+    routes:
+      - name: file-microservice-all
+        strip_path: true
+        paths:
+          - /api/v1/files/
+    plugins:
+      - name: cors
+      - name: jwt-user-id-plugin
+        config:
+          user_id_field: "sub"
+          header_name: "${JWT_USER_ID_HEADER}"
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
     _comment: 'Studio: /* -> http://studio:3000/*'

@@ -12,6 +12,7 @@ export 'themes/themes.dart';
 export 'utils/utils.dart';
 export 'services/services.dart';
 export 'services/api_service.dart';
+export 'services/file_service.dart';
 export 'models/models.dart';
 export 'models/api_models.dart';
 export 'repositories/api_repositories.dart';

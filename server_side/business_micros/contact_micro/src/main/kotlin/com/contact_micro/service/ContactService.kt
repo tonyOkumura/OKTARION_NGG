@@ -51,9 +51,9 @@ class ContactService(private val connection: Connection, private val paginationC
         
         private const val INSERT_CONTACT = """
             INSERT INTO contacts (id, username, first_name, last_name, display_name, email, phone, 
-                                 status_message, role, department, rank, position, company, 
+                                 is_online, status_message, role, department, rank, position, company, 
                                  avatar_url, date_of_birth, locale, timezone) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         
         private const val UPDATE_CONTACT = """
@@ -89,20 +89,21 @@ class ContactService(private val connection: Connection, private val paginationC
         statement.setString(5, null) // displayName - будет заполнен через PUT
         statement.setString(6, contact.email)
         statement.setString(7, null) // phone - будет заполнен через PUT
-        statement.setString(8, null) // statusMessage - будет заполнен через PUT
-        statement.setString(9, "user") // role - по умолчанию user
-        statement.setString(10, null) // department - будет заполнен через PUT
-        statement.setString(11, null) // rank - будет заполнен через PUT
-        statement.setString(12, null) // position - будет заполнен через PUT
-        statement.setString(13, null) // company - будет заполнен через PUT
+        statement.setBoolean(8, false) // is_online - по умолчанию false
+        statement.setString(9, null) // statusMessage - будет заполнен через PUT
+        statement.setString(10, "user") // role - по умолчанию user
+        statement.setString(11, null) // department - будет заполнен через PUT
+        statement.setString(12, null) // rank - будет заполнен через PUT
+        statement.setString(13, null) // position - будет заполнен через PUT
+        statement.setString(14, null) // company - будет заполнен через PUT
         
         // Автоматически генерируем avatar_url на основе userId
         val avatarUrl = "${avatarConfig.serviceUrl}/avatars/$userId/download"
-        statement.setString(14, avatarUrl)
+        statement.setString(15, avatarUrl)
         
-        statement.setDate(15, null) // dateOfBirth - будет заполнен через PUT
-        statement.setString(16, "ru") // locale - по умолчанию ru
-        statement.setString(17, "Europe/Moscow") // timezone - по умолчанию Europe/Moscow
+        statement.setDate(16, null) // dateOfBirth - будет заполнен через PUT
+        statement.setString(17, "ru") // locale - по умолчанию ru
+        statement.setString(18, "Europe/Moscow") // timezone - по умолчанию Europe/Moscow
 
         statement.executeUpdate()
         
@@ -367,10 +368,10 @@ class ContactService(private val connection: Connection, private val paginationC
             updateFields.add("company = ?")
             parameters.add(it)
         }
-        contact.avatarUrl?.let {
-            updateFields.add("avatar_url = ?")
-            parameters.add(it)
-        }
+        // Автоматически генерируем avatar_url на основе userId
+        val avatarUrl = "${avatarConfig.serviceUrl}/avatars/$id/download"
+        updateFields.add("avatar_url = ?")
+        parameters.add(avatarUrl)
         contact.dateOfBirth?.let {
             updateFields.add("date_of_birth = ?")
             parameters.add(java.sql.Date.valueOf(it))

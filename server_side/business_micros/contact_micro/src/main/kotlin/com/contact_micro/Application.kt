@@ -35,12 +35,13 @@ fun Application.module() {
     configureGracefulShutdown()
     
     // Configure business logic
+    val config = getAppConfig()
     val dbConnection = configureDatabases()
     configureHealthCheck()
     
     // Configure webhook routing in separate module (no authentication)
     routing {
-        configureWebhookRouting(dbConnection)
+        configureWebhookRouting(dbConnection, config.avatar)
     }
     
     // Configure authentication for main routes

@@ -3,6 +3,7 @@ package com.contact_micro.controller
 import com.contact_micro.model.SupabaseWebhookPayload
 import com.contact_micro.model.WebhookResponse
 import com.contact_micro.service.WebhookService
+import com.contact_micro.config.AvatarConfig
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -11,8 +12,8 @@ import io.ktor.server.routing.*
 import java.sql.Connection
 import org.slf4j.LoggerFactory
 
-fun Route.configureWebhookRouting(dbConnection: Connection) {
-    val webhookService = WebhookService(dbConnection)
+fun Route.configureWebhookRouting(dbConnection: Connection, avatarConfig: AvatarConfig) {
+    val webhookService = WebhookService(dbConnection, avatarConfig)
     val logger = LoggerFactory.getLogger("WebhookRouting")
     
     // Webhook endpoint for Supabase Auth events

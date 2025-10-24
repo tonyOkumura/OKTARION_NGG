@@ -4,12 +4,13 @@ import com.contact_micro.model.Contact
 import com.contact_micro.model.ContactCreateRequest
 import com.contact_micro.model.SupabaseUser
 import com.contact_micro.model.WebhookResponse
+import com.contact_micro.config.AvatarConfig
 import java.sql.Connection
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class WebhookService(private val dbConnection: Connection) {
+class WebhookService(private val dbConnection: Connection, private val avatarConfig: AvatarConfig) {
     
     fun processUserRegistration(user: SupabaseUser): WebhookResponse {
         return try {
@@ -137,7 +138,9 @@ class WebhookService(private val dbConnection: Connection) {
             stmt.setString(13, null) // rank
             stmt.setString(14, null) // position
             stmt.setString(15, null) // company
-            stmt.setString(16, null) // avatar_url
+            // Автоматически генерируем avatar_url на основе userId
+            val avatarUrl = "${avatarConfig.serviceUrl}/avatars/$contactId/download"
+            stmt.setString(16, avatarUrl) // avatar_url
             stmt.setDate(17, null) // date_of_birth
             stmt.setString(18, "ru") // locale
             stmt.setString(19, "Europe/Moscow") // timezone
