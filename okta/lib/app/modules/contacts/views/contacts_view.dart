@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../shared/widgets/widgets.dart';
 import '../controllers/contacts_controller.dart';
+import '../widgets/categorized_contacts_list.dart';
 
 class ContactsView extends GetView<ContactsController> {
   const ContactsView({super.key});
@@ -70,7 +71,12 @@ class ContactsView extends GetView<ContactsController> {
       );
     }
 
-    // Только список
+    // Проверяем нужно ли показывать категоризированный вид
+    if (controller.shouldShowCategorized) {
+      return _buildCategorizedView();
+    }
+
+    // Обычный список
     return _buildListView();
   }
 
@@ -80,6 +86,28 @@ class ContactsView extends GetView<ContactsController> {
       itemBuilder: (context, index) {
         return const ContactTileSkeleton();
       },
+    );
+  }
+
+  Widget _buildCategorizedView() {
+    return RefreshIndicator(
+      onRefresh: controller.refreshContacts,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          // Автоматически загружаем больше контактов при достижении конца
+          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent &&
+              controller.hasMore.value && 
+              !controller.isLoading.value) {
+            controller.loadMoreContacts();
+          }
+          return false;
+        },
+        child: Obx(() => CategorizedContactsList(
+          groupedContacts: controller.groupedContacts,
+          onContactTap: _onContactTap,
+          onMessagePressed: _onMessagePressed,
+        )),
+      ),
     );
   }
 

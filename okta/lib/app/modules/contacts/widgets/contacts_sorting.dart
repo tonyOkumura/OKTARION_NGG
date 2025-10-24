@@ -24,10 +24,15 @@ class ContactsSortingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = const [
+      DropdownMenuItem(value: 'created_at', child: Text('Дата создания')),
+      DropdownMenuItem(value: 'updated_at', child: Text('Дата обновления')),
       DropdownMenuItem(value: 'username', child: Text('Username')),
       DropdownMenuItem(value: 'firstName', child: Text('Имя')),
-      DropdownMenuItem(value: 'position', child: Text('Должность')),
+      DropdownMenuItem(value: 'lastName', child: Text('Фамилия')),
+      DropdownMenuItem(value: 'email', child: Text('Email')),
+      DropdownMenuItem(value: 'role', child: Text('Роль')),
       DropdownMenuItem(value: 'department', child: Text('Отдел')),
+      DropdownMenuItem(value: 'company', child: Text('Компания')),
     ];
 
     final orderItems = const [
@@ -38,6 +43,7 @@ class ContactsSortingWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const SizedBox(height: 8),
         GlassDropdownField<String>(
           label: 'Поле',
           value: sortBy,
@@ -45,6 +51,7 @@ class ContactsSortingWidget extends StatelessWidget {
           onChanged: onSortByChanged,
           prefixIcon: Icons.sort_by_alpha,
         ),
+        const SizedBox(height: 12),
         GlassDropdownField<String>(
           label: 'Порядок',
           value: sortOrder,
@@ -52,8 +59,7 @@ class ContactsSortingWidget extends StatelessWidget {
           onChanged: onSortOrderChanged,
           prefixIcon: Icons.swap_vert,
         ),
-        
-        
+        const SizedBox(height: 8),
       ],
     );
   }

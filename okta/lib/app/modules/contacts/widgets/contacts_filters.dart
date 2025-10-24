@@ -50,6 +50,7 @@ class ContactsFiltersWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const SizedBox(height: 8),
           GlassDropdownField<DepartmentType>(
             label: 'Отдел',
             value: department,
@@ -60,6 +61,7 @@ class ContactsFiltersWidget extends StatelessWidget {
             onChanged: (v) => onDepartmentChanged?.call(v),
             prefixIcon: Icons.business_outlined,
           ),
+          const SizedBox(height: 12),
           GlassDropdownField<CompanyType>(
             label: 'Компания',
             value: company,
@@ -70,6 +72,7 @@ class ContactsFiltersWidget extends StatelessWidget {
             onChanged: (v) => onCompanyChanged?.call(v),
             prefixIcon: Icons.business,
           ),
+          const SizedBox(height: 12),
           GlassDropdownField<PositionType>(
             label: 'Должность',
             value: position,
@@ -80,6 +83,7 @@ class ContactsFiltersWidget extends StatelessWidget {
             onChanged: (v) => onPositionChanged?.call(v),
             prefixIcon: Icons.work_outline,
           ),
+          const SizedBox(height: 12),
           GlassDropdownField<RankType>(
             label: 'Звание',
             value: rank,
@@ -90,6 +94,7 @@ class ContactsFiltersWidget extends StatelessWidget {
             onChanged: (v) => onRankChanged?.call(v),
             prefixIcon: Icons.military_tech_outlined,
           ),
+          const SizedBox(height: 12),
           GlassDropdownField<StatusType>(
             label: 'Статус',
             value: status,
@@ -100,7 +105,7 @@ class ContactsFiltersWidget extends StatelessWidget {
             onChanged: (v) => onStatusChanged?.call(v),
             prefixIcon: Icons.circle_outlined,
           ),
-       
+          const SizedBox(height: 8),
         ],
       ),
     );

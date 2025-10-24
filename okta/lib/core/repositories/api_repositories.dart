@@ -17,20 +17,57 @@ abstract class BaseRepository {
 // Репозиторий для контактов
 class ContactsRepository extends BaseRepository {
 
-  // Получить список контактов
+  // Получить список контактов с пагинацией, поиском, фильтрацией и сортировкой
   Future<ApiResponse<ContactsResponse>> getContacts({
     String? search,
     String? cursor,
     int? limit,
     String? sortBy,
     String? sortOrder,
+    // Параметры фильтрации
+    String? role,
+    String? department,
+    String? company,
+    bool? isOnline,
+    String? locale,
+    String? timezone,
+    String? username,
+    String? email,
+    String? phone,
+    String? firstName,
+    String? lastName,
+    String? displayName,
+    String? statusMessage,
+    String? rank,
+    String? position,
   }) async {
     final queryParams = <String, dynamic>{};
+    
+    // Поиск и пагинация
     if (search != null && search.isNotEmpty) queryParams['search'] = search;
     if (cursor != null) queryParams['cursor'] = cursor;
     if (limit != null) queryParams['limit'] = limit;
+    
+    // Сортировка
     if (sortBy != null) queryParams['sortBy'] = sortBy;
     if (sortOrder != null) queryParams['sortOrder'] = sortOrder;
+    
+    // Фильтрация
+    if (role != null) queryParams['role'] = role;
+    if (department != null) queryParams['department'] = department;
+    if (company != null) queryParams['company'] = company;
+    if (isOnline != null) queryParams['is_online'] = isOnline;
+    if (locale != null) queryParams['locale'] = locale;
+    if (timezone != null) queryParams['timezone'] = timezone;
+    if (username != null) queryParams['username'] = username;
+    if (email != null) queryParams['email'] = email;
+    if (phone != null) queryParams['phone'] = phone;
+    if (firstName != null) queryParams['firstName'] = firstName;
+    if (lastName != null) queryParams['lastName'] = lastName;
+    if (displayName != null) queryParams['displayName'] = displayName;
+    if (statusMessage != null) queryParams['statusMessage'] = statusMessage;
+    if (rank != null) queryParams['rank'] = rank;
+    if (position != null) queryParams['position'] = position;
 
     return await api.get<ContactsResponse>(
       ApiEndpoints.getContacts,
