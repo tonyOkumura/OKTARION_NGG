@@ -272,15 +272,15 @@ class _ContactEditingFormState extends State<_ContactEditingForm> {
                     Row(
                       children: [
                         Expanded(
-                          child: GlassDropdownField<PositionType>(
-                            label: 'Должность',
-                            value: _position,
+                          child: GlassDropdownField<CompanyType>(
+                            label: 'Управление',
+                            value: _company,
                             items: WorkTypesLabels.buildDropdownItems(
-                              PositionType.values,
-                              WorkTypesLabels.position,
+                              CompanyType.values,
+                              WorkTypesLabels.company,
                             ),
-                            onChanged: (v) => setState(() => _position = v),
-                            prefixIcon: Icons.work_outline,
+                            onChanged: (v) => setState(() => _company = v),
+                            prefixIcon: Icons.business,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -298,8 +298,22 @@ class _ContactEditingFormState extends State<_ContactEditingForm> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
+                        Expanded(
+                          child: GlassDropdownField<PositionType>(
+                            label: 'Должность',
+                            value: _position,
+                            items: WorkTypesLabels.buildDropdownItems(
+                              PositionType.values,
+                              WorkTypesLabels.position,
+                            ),
+                            onChanged: (v) => setState(() => _position = v),
+                            prefixIcon: Icons.work_outline,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: GlassDropdownField<RankType>(
                             label: 'Звание',
@@ -312,32 +326,19 @@ class _ContactEditingFormState extends State<_ContactEditingForm> {
                             prefixIcon: Icons.military_tech_outlined,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: GlassDropdownField<CompanyType>(
-                            label: 'Компания',
-                            value: _company,
-                            items: WorkTypesLabels.buildDropdownItems(
-                              CompanyType.values,
-                              WorkTypesLabels.company,
-                            ),
-                            onChanged: (v) => setState(() => _company = v),
-                            prefixIcon: Icons.business,
-                          ),
-                        ),
                       ],
                     ),
                   ]
                 : [
-                    GlassDropdownField<PositionType>(
-                      label: 'Должность',
-                      value: _position,
+                    GlassDropdownField<CompanyType>(
+                      label: 'Управление',
+                      value: _company,
                       items: WorkTypesLabels.buildDropdownItems(
-                        PositionType.values,
-                        WorkTypesLabels.position,
+                        CompanyType.values,
+                        WorkTypesLabels.company,
                       ),
-                      onChanged: (v) => setState(() => _position = v),
-                      prefixIcon: Icons.work_outline,
+                      onChanged: (v) => setState(() => _company = v),
+                      prefixIcon: Icons.business,
                     ),
                     GlassDropdownField<DepartmentType>(
                       label: 'Отдел',
@@ -349,6 +350,16 @@ class _ContactEditingFormState extends State<_ContactEditingForm> {
                       onChanged: (v) => setState(() => _department = v),
                       prefixIcon: Icons.business_outlined,
                     ),
+                    GlassDropdownField<PositionType>(
+                      label: 'Должность',
+                      value: _position,
+                      items: WorkTypesLabels.buildDropdownItems(
+                        PositionType.values,
+                        WorkTypesLabels.position,
+                      ),
+                      onChanged: (v) => setState(() => _position = v),
+                      prefixIcon: Icons.work_outline,
+                    ),
                     GlassDropdownField<RankType>(
                       label: 'Звание',
                       value: _rank,
@@ -358,16 +369,6 @@ class _ContactEditingFormState extends State<_ContactEditingForm> {
                       ),
                       onChanged: (v) => setState(() => _rank = v),
                       prefixIcon: Icons.military_tech_outlined,
-                    ),
-                    GlassDropdownField<CompanyType>(
-                      label: 'Компания',
-                      value: _company,
-                      items: WorkTypesLabels.buildDropdownItems(
-                        CompanyType.values,
-                        WorkTypesLabels.company,
-                      ),
-                      onChanged: (v) => setState(() => _company = v),
-                      prefixIcon: Icons.business,
                     ),
                   ],
           ),

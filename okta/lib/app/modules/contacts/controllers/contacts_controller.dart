@@ -75,7 +75,7 @@ class ContactsController extends GetxController {
   
   // Добавляем контакт в дерево категорий
   void _addContactToTree(Map<String, dynamic> tree, Contact contact) {
-    // Создаем путь категорий: Компания -> Отдел -> Должность (убираем звание)
+    // Создаем путь категорий: Управление -> Отдел -> Должность (убираем звание)
     final List<String> categoryPath = [];
     
     // Проверяем каждое поле и добавляем "Не указано" если пустое

@@ -31,8 +31,10 @@ class ContactsSortingWidget extends StatelessWidget {
       DropdownMenuItem(value: 'lastName', child: Text('Фамилия')),
       DropdownMenuItem(value: 'email', child: Text('Email')),
       DropdownMenuItem(value: 'role', child: Text('Роль')),
+      DropdownMenuItem(value: 'company', child: Text('Управление')),
       DropdownMenuItem(value: 'department', child: Text('Отдел')),
-      DropdownMenuItem(value: 'company', child: Text('Компания')),
+      DropdownMenuItem(value: 'position', child: Text('Должность')),
+      DropdownMenuItem(value: 'rank', child: Text('Звание')),
     ];
 
     final orderItems = const [

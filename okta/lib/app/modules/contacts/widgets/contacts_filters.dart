@@ -51,6 +51,17 @@ class ContactsFiltersWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 8),
+          GlassDropdownField<CompanyType>(
+            label: 'Управление',
+            value: company,
+            items: WorkTypesLabels.buildDropdownItems(
+              CompanyType.values,
+              WorkTypesLabels.company,
+            ),
+            onChanged: (v) => onCompanyChanged?.call(v),
+            prefixIcon: Icons.business,
+          ),
+          const SizedBox(height: 12),
           GlassDropdownField<DepartmentType>(
             label: 'Отдел',
             value: department,
@@ -60,17 +71,6 @@ class ContactsFiltersWidget extends StatelessWidget {
             ),
             onChanged: (v) => onDepartmentChanged?.call(v),
             prefixIcon: Icons.business_outlined,
-          ),
-          const SizedBox(height: 12),
-          GlassDropdownField<CompanyType>(
-            label: 'Компания',
-            value: company,
-            items: WorkTypesLabels.buildDropdownItems(
-              CompanyType.values,
-              WorkTypesLabels.company,
-            ),
-            onChanged: (v) => onCompanyChanged?.call(v),
-            prefixIcon: Icons.business,
           ),
           const SizedBox(height: 12),
           GlassDropdownField<PositionType>(

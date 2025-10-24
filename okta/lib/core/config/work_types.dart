@@ -2,54 +2,53 @@ import 'package:flutter/material.dart';
 
 /// Тип должности
 enum PositionType {
-  intern,
-  junior,
-  middle,
-  senior,
-  lead,
-  manager,
-  director,
-  cLevel,
-  other,
+  chief, // начальник
+  deputyChief, // зам.начальника
+  labChief, // начальник лаборатории
+  deputyLabChief, // зам.начальника лаборатории
+  departmentChief, // начальник кафедры
+  deputyDepartmentChief, // зам.начальника кафедры
+  courseChief, // начальник курса
+  deputyCourseChief, // зам.начальника курса
+  teacher, // преподаватель
+  assistant, // ассистент
+  associateProfessor, // доцент
+  professor, // профессор
 }
 
 /// Тип отдела
 enum DepartmentType {
-  engineering,
-  product,
-  design,
-  marketing,
-  sales,
-  support,
-  hr,
-  finance,
-  operations,
-  legal,
-  other,
+  department, // кафедра
+  laboratory, // лаборатория
+  course, // курс
 }
 
 /// Звание/грейд
 enum RankType {
-  trainee,
-  grade1,
-  grade2,
-  grade3,
-  principal,
-  staff,
-  distinguished,
-  other,
+  private, // рядовой
+  sergeant, // сержант
+  seniorSergeant, // старшина
+  lieutenant, // лейтенант
+  captain, // капитан
+  major, // майор
+  lieutenantColonel, // подполковник
+  colonel, // полковник
 }
 
-/// Компания/подразделение
+/// Управление/подразделение
 enum CompanyType {
-  main,
-  subsidiaryA,
-  subsidiaryB,
-  subsidiaryC,
-  partner,
-  contractor,
-  freelance,
-  other,
+  academy, // академия
+  faculty1, // 1 факультет
+  faculty2, // 2 факультет
+  faculty3, // 3 факультет
+  faculty4, // 4 факультет
+  faculty5, // 5 факультет
+  faculty6, // 6 факультет
+  faculty7, // 7 факультет
+  faculty8, // 8 факультет
+  faculty9, // 9 факультет
+  spoFaculty, // факультет Спо
+  vini, // ВиНи
 }
 
 /// Статус/состояние пользователя
@@ -70,57 +69,56 @@ enum StatusType {
 class WorkTypesLabels {
   static String position(PositionType v) {
     switch (v) {
-      case PositionType.intern: return 'Стажер';
-      case PositionType.junior: return 'Младший специалист';
-      case PositionType.middle: return 'Специалист';
-      case PositionType.senior: return 'Старший специалист';
-      case PositionType.lead: return 'Лид';
-      case PositionType.manager: return 'Менеджер';
-      case PositionType.director: return 'Директор';
-      case PositionType.cLevel: return 'C-level';
-      case PositionType.other: return 'Другое';
+      case PositionType.chief: return 'Начальник';
+      case PositionType.deputyChief: return 'Зам. начальника';
+      case PositionType.labChief: return 'Начальник лаборатории';
+      case PositionType.deputyLabChief: return 'Зам. начальника лаборатории';
+      case PositionType.departmentChief: return 'Начальник кафедры';
+      case PositionType.deputyDepartmentChief: return 'Зам. начальника кафедры';
+      case PositionType.courseChief: return 'Начальник курса';
+      case PositionType.deputyCourseChief: return 'Зам. начальника курса';
+      case PositionType.teacher: return 'Преподаватель';
+      case PositionType.assistant: return 'Ассистент';
+      case PositionType.associateProfessor: return 'Доцент';
+      case PositionType.professor: return 'Профессор';
     }
   }
 
   static String department(DepartmentType v) {
     switch (v) {
-      case DepartmentType.engineering: return 'Инженерия';
-      case DepartmentType.product: return 'Продукт';
-      case DepartmentType.design: return 'Дизайн';
-      case DepartmentType.marketing: return 'Маркетинг';
-      case DepartmentType.sales: return 'Продажи';
-      case DepartmentType.support: return 'Поддержка';
-      case DepartmentType.hr: return 'HR';
-      case DepartmentType.finance: return 'Финансы';
-      case DepartmentType.operations: return 'Операции';
-      case DepartmentType.legal: return 'Юридический отдел';
-      case DepartmentType.other: return 'Другое';
+      case DepartmentType.department: return 'Кафедра';
+      case DepartmentType.laboratory: return 'Лаборатория';
+      case DepartmentType.course: return 'Курс';
     }
   }
 
   static String rank(RankType v) {
     switch (v) {
-      case RankType.trainee: return 'Стажер';
-      case RankType.grade1: return 'Грейд 1';
-      case RankType.grade2: return 'Грейд 2';
-      case RankType.grade3: return 'Грейд 3';
-      case RankType.principal: return 'Principal';
-      case RankType.staff: return 'Staff';
-      case RankType.distinguished: return 'Distinguished';
-      case RankType.other: return 'Другое';
+      case RankType.private: return 'Рядовой';
+      case RankType.sergeant: return 'Сержант';
+      case RankType.seniorSergeant: return 'Старшина';
+      case RankType.lieutenant: return 'Лейтенант';
+      case RankType.captain: return 'Капитан';
+      case RankType.major: return 'Майор';
+      case RankType.lieutenantColonel: return 'Подполковник';
+      case RankType.colonel: return 'Полковник';
     }
   }
 
   static String company(CompanyType v) {
     switch (v) {
-      case CompanyType.main: return 'Основная компания';
-      case CompanyType.subsidiaryA: return 'Дочерняя A';
-      case CompanyType.subsidiaryB: return 'Дочерняя B';
-      case CompanyType.subsidiaryC: return 'Дочерняя C';
-      case CompanyType.partner: return 'Партнер';
-      case CompanyType.contractor: return 'Подрядчик';
-      case CompanyType.freelance: return 'Фриланс';
-      case CompanyType.other: return 'Другое';
+      case CompanyType.academy: return 'Академия';
+      case CompanyType.faculty1: return '1 факультет';
+      case CompanyType.faculty2: return '2 факультет';
+      case CompanyType.faculty3: return '3 факультет';
+      case CompanyType.faculty4: return '4 факультет';
+      case CompanyType.faculty5: return '5 факультет';
+      case CompanyType.faculty6: return '6 факультет';
+      case CompanyType.faculty7: return '7 факультет';
+      case CompanyType.faculty8: return '8 факультет';
+      case CompanyType.faculty9: return '9 факультет';
+      case CompanyType.spoFaculty: return 'Факультет СПО';
+      case CompanyType.vini: return 'ВиНи';
     }
   }
 
