@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../core/constants/ui_constants.dart';
 
 /// Скелетон для ContactTile во время загрузки
 class ContactTileSkeleton extends StatelessWidget {
@@ -25,8 +26,8 @@ class ContactTileSkeleton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Shimmer.fromColors(
-          baseColor: cs.surfaceVariant.withValues(alpha: 0.3),
-          highlightColor: cs.surfaceVariant.withValues(alpha: 0.6),
+          baseColor: UIConstants.skeletonBaseColor(context),
+          highlightColor: UIConstants.skeletonHighlightColor(context),
           child: Row(
             children: [
               // Скелетон аватара
@@ -34,7 +35,7 @@ class ContactTileSkeleton extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: cs.surfaceVariant,
+                  color: UIConstants.skeletonBaseColor(context),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -51,7 +52,7 @@ class ContactTileSkeleton extends StatelessWidget {
                       height: 16,
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        color: cs.surfaceVariant,
+                        color: UIConstants.skeletonBaseColor(context),
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
@@ -63,7 +64,7 @@ class ContactTileSkeleton extends StatelessWidget {
                       height: 12,
                       width: 120,
                       decoration: BoxDecoration(
-                        color: cs.surfaceVariant,
+                        color: UIConstants.skeletonBaseColor(context),
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),
@@ -75,7 +76,7 @@ class ContactTileSkeleton extends StatelessWidget {
                       height: 12,
                       width: 80,
                       decoration: BoxDecoration(
-                        color: cs.surfaceVariant,
+                        color: UIConstants.skeletonBaseColor(context),
                         borderRadius: BorderRadius.circular(6),
                       ),
                     ),

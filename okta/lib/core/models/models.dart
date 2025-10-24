@@ -5,3 +5,4 @@ export 'api_models.dart';
 export 'contact_model.dart';
 export 'contacts_response_model.dart';
 export 'notification_types.dart';
+export 'update_profile_request.dart';

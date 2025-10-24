@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart' hide ScreenType;
 import '../../core/models/contact_model.dart';
 import '../../core/utils/screen_type_helper.dart';
 import '../../core/config/work_types.dart';
@@ -9,14 +10,16 @@ import 'glass_text_field.dart';
 
 /// Диалог редактирования контакта
 class ContactEditingDialog extends StatelessWidget {
-  const ContactEditingDialog({
+  ContactEditingDialog({
     super.key,
     required this.contact,
     this.onSave,
   });
 
   final Contact contact;
-  final Function(Contact updatedContact)? onSave;
+  final Future<void> Function(Contact updatedContact)? onSave;
+  
+  final GlobalKey<_ContactEditingFormState> _formKey = GlobalKey<_ContactEditingFormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +36,7 @@ class ContactEditingDialog extends StatelessWidget {
       height: dialogHeight,
       onConfirm: () => _handleSave(context),
       child: _ContactEditingForm(
+        key: _formKey,
         contact: contact,
         onContactChanged: (updatedContact) {
           // Здесь можно обновить локальное состояние
@@ -59,32 +63,41 @@ class ContactEditingDialog extends StatelessWidget {
   double? _getAdaptiveDialogHeight(double screenHeight, ScreenType screenType) {
     switch (screenType) {
       case ScreenType.phone:
+        return screenHeight * 0.85; // почти на всю высоту
       case ScreenType.mobile:
-        return screenHeight * 0.9; // высокая прокручиваемая форма
+        return screenHeight * 0.8;
       case ScreenType.tablet:
-        return 620;
+        return 700; // фиксированная высота на планшетах
       case ScreenType.laptop:
-        return 600;
+        return 650;
       case ScreenType.desktop:
-        return 580;
+        return 600;
     }
   }
 
-  void _handleSave(BuildContext context) {
-    // TODO: Реализовать сохранение через API
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Контакт сохранен (заглушка)'),
-        backgroundColor: Colors.green,
-      ),
-    );
-    onSave?.call(contact);
+  void _handleSave(BuildContext context) async {
+    final formState = _formKey.currentState;
+    
+    if (formState != null && formState._formKey.currentState?.validate() == true) {
+      final updatedContact = formState._buildUpdatedContact();
+      
+      try {
+        // Ждем завершения операции сохранения
+        await onSave?.call(updatedContact);
+        
+        // Используем GetX навигацию вместо Navigator.of(context)
+        Get.back();
+      } catch (e) {
+        // Не закрываем диалог при ошибке, чтобы пользователь мог попробовать снова
+      }
+    }
   }
 }
 
 /// Форма редактирования контакта
 class _ContactEditingForm extends StatefulWidget {
   const _ContactEditingForm({
+    super.key,
     required this.contact,
     required this.onContactChanged,
   });
@@ -97,6 +110,7 @@ class _ContactEditingForm extends StatefulWidget {
 }
 
 class _ContactEditingFormState extends State<_ContactEditingForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _displayNameController;
@@ -146,10 +160,12 @@ class _ContactEditingFormState extends State<_ContactEditingForm> {
         screenType == ScreenType.laptop ||
         screenType == ScreenType.desktop;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+    return Form(
+      key: _formKey,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           _buildAvatarSection(theme, cs),
           const SizedBox(height: 24),
 
@@ -390,7 +406,7 @@ class _ContactEditingFormState extends State<_ContactEditingForm> {
                   ],
           ),
         ],
-      ),
+      ),)
     );
   }
 
@@ -473,6 +489,33 @@ class _ContactEditingFormState extends State<_ContactEditingForm> {
           filled: true,
         ),
       ),
+    );
+  }
+
+  /// Создать обновленный контакт из данных формы
+  Contact _buildUpdatedContact() {
+    return Contact(
+      id: widget.contact.id,
+      username: widget.contact.username,
+      firstName: _firstNameController.text.isNotEmpty ? _firstNameController.text : null,
+      lastName: _lastNameController.text.isNotEmpty ? _lastNameController.text : null,
+      displayName: _displayNameController.text.isNotEmpty ? _displayNameController.text : null,
+      email: _emailController.text.isNotEmpty ? _emailController.text : null,
+      phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
+      isOnline: widget.contact.isOnline,
+      lastSeenAt: widget.contact.lastSeenAt,
+      statusMessage: _status != null ? WorkTypesLabels.status(_status!) : null,
+      role: widget.contact.role,
+      department: _department != null ? WorkTypesLabels.department(_department!) : null,
+      rank: _rank != null ? WorkTypesLabels.rank(_rank!) : null,
+      position: _position != null ? WorkTypesLabels.position(_position!) : null,
+      company: _company != null ? WorkTypesLabels.company(_company!) : null,
+      avatarUrl: widget.contact.avatarUrl,
+      dateOfBirth: widget.contact.dateOfBirth,
+      locale: widget.contact.locale,
+      timezone: widget.contact.timezone,
+      createdAt: widget.contact.createdAt,
+      updatedAt: DateTime.now(),
     );
   }
 

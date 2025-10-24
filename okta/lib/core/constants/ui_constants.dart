@@ -125,4 +125,15 @@ class UIConstants {
   static const String emailRegex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
   static const String phoneRegex = r'^\+?[1-9]\d{1,14}$';
   static const String usernameRegex = r'^[a-zA-Z0-9_]{3,20}$';
+
+  // ==================== SKELETON COLORS ====================
+  /// Базовый цвет для скелетонов - использует onSurface из темы
+  static Color skeletonBaseColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3);
+  }
+  
+  /// Цвет подсветки для скелетонов - более яркий onSurface
+  static Color skeletonHighlightColor(BuildContext context) {
+    return Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
+  }
 }

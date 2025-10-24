@@ -216,7 +216,7 @@ class LoginView extends GetView<LoginController> {
                                         padding: const EdgeInsets.only(
                                           top: UIConstants.spacing8,
                                         ),
-                                          child: Text(
+        child: Text(
                                           err,
                                           style: theme.textTheme.bodyMedium?.copyWith(
                                             color: theme.colorScheme.error,

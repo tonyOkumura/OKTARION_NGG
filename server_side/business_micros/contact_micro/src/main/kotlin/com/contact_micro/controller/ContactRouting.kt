@@ -130,6 +130,57 @@ fun Application.configureContactRouting(dbConnection: Connection, paginationConf
             }
         }
 
+        // Get current user's contact data
+        get("/me") {
+            try {
+                val userId = call.getUserId()
+                call.logWithUser("info", "Reading current user's contact data")
+                
+                val contact = contactService.readById(userId ?: throw IllegalArgumentException("Okta-User-ID header is required"))
+                call.logWithUser("info", "Current user contact retrieved successfully: ${contact.displayName ?: contact.email ?: "Unknown"}")
+                call.respond(HttpStatusCode.OK, contact)
+            } catch (e: IllegalArgumentException) {
+                call.logWithUser("warn", "Invalid user ID format: ${e.message}")
+                call.respondBadRequest(e.message ?: "Invalid user ID")
+            } catch (e: Exception) {
+                if (e.message == "Contact not found") {
+                    call.logWithUser("warn", "Current user contact not found")
+                    call.respondNotFound("Contact not found")
+                } else {
+                    call.logWithUser("error", "Failed to read current user contact: ${e.message}")
+                    call.respondInternalError("Failed to read contact: ${e.message}")
+                }
+            }
+        }
+
+        // Update current user's contact data
+        put("/me") {
+            try {
+                val userId = call.getUserId()
+                call.logWithUser("info", "Updating current user's contact data")
+                
+                val contact = call.receive<ContactUpdateRequest>()
+                
+                // Валидация
+                val validationErrors = validateContactUpdate(contact)
+                if (validationErrors.isNotEmpty()) {
+                    call.logWithUser("warn", "Contact validation failed for current user update: ${validationErrors.joinToString { "${it.field}: ${it.message}" }}")
+                    call.respondValidationError("Validation failed", validationErrors)
+                    return@put
+                }
+                
+                contactService.update(userId ?: throw IllegalArgumentException("Okta-User-ID header is required"), contact)
+                call.logWithUser("info", "Current user contact updated successfully")
+                call.respond(HttpStatusCode.OK, mapOf<String, Any>("message" to "Contact updated successfully", "updatedBy" to (userId ?: "unknown")))
+            } catch (e: IllegalArgumentException) {
+                call.logWithUser("warn", "Invalid user ID format for current user update: ${e.message}")
+                call.respondBadRequest(e.message ?: "Invalid user ID")
+            } catch (e: Exception) {
+                call.logWithUser("error", "Failed to update current user contact: ${e.message}")
+                call.respondInternalError("Failed to update contact: ${e.message}")
+            }
+        }
+
         // Read contact by ID
         get("/{id}") {
             try {

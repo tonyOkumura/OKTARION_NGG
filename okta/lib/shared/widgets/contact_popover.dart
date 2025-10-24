@@ -293,21 +293,5 @@ class ContactPopover extends StatelessWidget {
     }
   }
 
-  void _showEditDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => ContactEditingDialog(
-        contact: contact,
-        onSave: (updatedContact) {
-          // TODO: Обновить контакт в списке
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Контакт ${updatedContact.displayNameOrUsername} обновлен'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        },
-      ),
-    );
-  }
+  
 }

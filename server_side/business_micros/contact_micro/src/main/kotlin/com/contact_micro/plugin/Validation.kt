@@ -46,7 +46,7 @@ fun validateContactUpdate(contact: ContactUpdateRequest): List<ValidationError> 
             errors.add(ValidationError("username", "Username must be at least 3 characters"))
         } else if (contact.username.length > 255) {
             errors.add(ValidationError("username", "Username cannot exceed 255 characters"))
-        } else if (!contact.username.matches(Regex("^[a-zA-Z0-9_-]+$"))) {
+        } else if (!contact.username.matches(Regex("^[\\p{L}\\p{N}_-]+$"))) {
             errors.add(ValidationError("username", "Username can only contain letters, numbers, underscores and hyphens"))
         }
     }
